@@ -11,7 +11,7 @@ add_versioned_package(
     GITHUB_REPOSITORY
     TheLartians/Format.cmake
     OPTIONS
-    "CMAKE_FORMAT_EXCLUDE cmake/CPM.cmake")
+    "CMAKE_FORMAT_EXCLUDE cmake/get_cpm.cmake")
 
 add_dependencies(quality check-clang-format check-cmake-format)
 add_dependencies(ci-quality check-clang-format check-cmake-format)
