@@ -1,3 +1,4 @@
 {
+  "headless": 1,
   "args": ["--no-sandbox"]
 }

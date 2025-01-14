@@ -25,15 +25,23 @@ target_compile_options(sanitizer-exceptions INTERFACE -fno-sanitize=vptr)
 
 macro(get_catch2)
     if(NOT TARGET Catch2::Catch2WithMain)
-        add_versioned_package("gh:catchorg/Catch2@3.6.0")
+        add_versioned_package("gh:catchorg/Catch2@3.8.0")
         list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
         include(Catch)
+
+        # Workaround for https://github.com/catchorg/Catch2/issues/2910
+        add_library(clean-catch2-warnings INTERFACE)
+        target_compile_options(
+            clean-catch2-warnings
+            INTERFACE
+                $<$<AND:$<CXX_COMPILER_ID:Clang>,$<VERSION_GREATER_EQUAL:${CMAKE_CXX_COMPILER_VERSION},19>>:-Wno-c++20-extensions>
+        )
     endif()
 endmacro()
 
 macro(get_gtest)
     if(NOT TARGET gtest)
-        add_versioned_package("gh:google/googletest@1.14.0")
+        add_versioned_package("gh:google/googletest@1.15.2")
         include(GoogleTest)
     endif()
 endmacro()
@@ -45,7 +53,7 @@ macro(get_gunit)
             NAME
             gunit
             GIT_TAG
-            v1.14.0
+            467b07d
             GITHUB_REPOSITORY
             cpp-testing/GUnit
             DOWNLOAD_ONLY
@@ -55,7 +63,7 @@ endmacro()
 
 macro(get_snitch)
     if(NOT TARGET snitch::snitch)
-        add_versioned_package("gh:snitch-org/snitch@1.2.5")
+        add_versioned_package("gh:snitch-org/snitch@1.3.1")
     endif()
 endmacro()
 
@@ -90,7 +98,7 @@ endmacro()
 
 macro(add_rapidcheck)
     if(NOT TARGET rapidcheck)
-        add_versioned_package(NAME rapidcheck GIT_TAG 1c91f40 GITHUB_REPOSITORY
+        add_versioned_package(NAME rapidcheck GIT_TAG ff6af6f GITHUB_REPOSITORY
                               emil-e/rapidcheck)
         add_subdirectory(
             ${rapidcheck_SOURCE_DIR}/extras/catch
@@ -134,6 +142,7 @@ function(add_unit_test_target name)
                 catch_discover_tests(${name})
             endif()
         endif()
+        target_link_libraries(${name} PRIVATE clean-catch2-warnings)
     elseif(UNIT_GTEST)
         target_link_libraries_system(
             ${name}
@@ -402,7 +411,8 @@ function(add_fuzz_test_target name)
         rapidcheck
         rapidcheck_gtest
         rapidcheck_gmock
-        fuzztest::fuzztest_gtest_main)
+        fuzztest::fuzztest_gtest_main
+        re2::re2)
     if(FUZZ_NORANDOM)
         message(
             WARNING
