@@ -460,16 +460,20 @@ macro(add_fuzz_test)
 endmacro()
 
 function(add_compile_fail_test test_file)
+    set(singleValueArgs NAME)
     set(multiValueArgs INCLUDE_DIRECTORIES LIBRARIES SYSTEM_LIBRARIES)
-    cmake_parse_arguments(CF "" "" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(CF "" "${singleValueArgs}" "${multiValueArgs}"
+                          ${ARGN})
 
-    string(REPLACE "/" "_" test_name "${test_file}")
-    string(PREPEND test_name "EXPECT_FAIL.")
-    add_executable(${test_name} EXCLUDE_FROM_ALL ${test_file})
+    if(NOT CF_NAME)
+        string(REPLACE "/" "_" CF_NAME "${test_file}")
+    endif()
+    string(PREPEND CF_NAME "EXPECT_FAIL.")
+    add_executable(${CF_NAME} EXCLUDE_FROM_ALL ${test_file})
 
-    target_include_directories(${test_name} PRIVATE ${CF_INCLUDE_DIRECTORIES})
-    target_link_libraries(${test_name} PRIVATE ${CF_LIBRARIES})
-    target_link_libraries_system(${test_name} PRIVATE ${CF_SYSTEM_LIBRARIES})
+    target_include_directories(${CF_NAME} PRIVATE ${CF_INCLUDE_DIRECTORIES})
+    target_link_libraries(${CF_NAME} PRIVATE ${CF_LIBRARIES})
+    target_link_libraries_system(${CF_NAME} PRIVATE ${CF_SYSTEM_LIBRARIES})
 
     file(STRINGS ${test_file} pattern REGEX "// EXPECT: ")
     if(NOT pattern)
@@ -478,9 +482,8 @@ function(add_compile_fail_test test_file)
         string(REGEX REPLACE ".*// EXPECT: " "" pattern ${pattern})
     endif()
 
-    add_test(NAME ${test_name}
-             COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target
-                     ${test_name})
-    set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
-                                                 "${pattern}")
+    add_test(NAME ${CF_NAME} COMMAND ${CMAKE_COMMAND} --build
+                                     ${CMAKE_BINARY_DIR} --target ${CF_NAME})
+    set_tests_properties(${CF_NAME} PROPERTIES PASS_REGULAR_EXPRESSION
+                                               "${pattern}")
 endfunction()

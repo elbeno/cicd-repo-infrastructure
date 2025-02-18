@@ -40,6 +40,9 @@ endfunction()
 
 find_mull()
 
+option(INFRA_LOUD_MULL_FAILURE
+       "Output per-target warning when mull is not available." OFF)
+
 function(add_mull_test name)
     set(options EXCLUDE_CTEST)
     set(singleValueArgs PLUGIN_DIR RUNNER_DIR)
@@ -66,10 +69,12 @@ function(add_mull_test name)
         set(MULL_RUNNER_DIR "<RUNNER_DIR not provided>")
     endif()
     if(NOT MULL_RUNNER)
-        message(
-            WARNING
-                "mull-runner-${version} not found at ${MULL_RUNNER_DIR}. mull_${name} is a failing test."
-        )
+        if(INFRA_LOUD_MULL_FAILURE)
+            message(
+                WARNING
+                    "mull-runner-${version} not found at ${MULL_RUNNER_DIR}. mull_${name} is a failing test."
+            )
+        endif()
         add_custom_target(mull_${name} ${MULL_RUNNER_NOT_FOUND_COMMAND})
         add_dependencies(mull_tests mull_${name})
         return()
@@ -83,10 +88,12 @@ function(add_mull_test name)
         set(MULL_PLUGIN_DIR "<PLUGIN_DIR not provided>")
     endif()
     if(NOT MULL_PLUGIN)
-        message(
-            WARNING
-                "mull-ir-frontend-${version} not found at ${MULL_PLUGIN_DIR}. mull_${name} is a failing test."
-        )
+        if(INFRA_LOUD_MULL_FAILURE)
+            message(
+                WARNING
+                    "mull-ir-frontend-${version} not found at ${MULL_PLUGIN_DIR}. mull_${name} is a failing test."
+            )
+        endif()
         add_custom_target(mull_${name} ${MULL_PLUGIN_NOT_FOUND_COMMAND})
         add_dependencies(mull_tests mull_${name})
         return()
