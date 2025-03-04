@@ -5,11 +5,15 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '^".*'
     Priority: 1
-  - Regex: '^<(async|conc|container|cib|flow|interrupt|log|lookup|match|msg|safe|sc|seq)/.*'
+  - Regex: '^<(container|cib|flow|interrupt|log|lookup|match|msg|safe|sc|seq)/.*'
     Priority: 2
   - Regex: '^<groov/.*'
     Priority: 4
+  - Regex: '^<async/.*'
+    Priority: 6
   - Regex: '^<stdx/.*'
+    Priority: 7
+  - Regex: '^<conc/.*'
     Priority: 8
   - Regex: '^<(boost|catch2|fmt|fuzztest|gmock|gtest|rapidcheck|snitch)/.*'
     Priority: 9
@@ -19,4 +23,4 @@ IncludeCategories:
     Priority: 10
 
 QualifierAlignment: Custom
-QualifierOrder: ['constexpr', 'static', 'inline', 'type', 'const', 'volatile']
+QualifierOrder: ['friend', 'constexpr', 'static', 'inline', 'type', 'const', 'volatile']
