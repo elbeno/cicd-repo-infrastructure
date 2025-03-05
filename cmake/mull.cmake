@@ -1,10 +1,15 @@
 add_custom_target(mull_tests)
 
+option(INFRA_LOUD_MULL_FAILURE
+       "Output per-target warning when mull is not available." OFF)
+
 function(add_mull_test name)
-    message(
-        STATUS
-            "add_mull_test(${name}) is disabled because CMAKE_CXX_COMPILER_ID is ${CMAKE_CXX_COMPILER_ID}."
-    )
+    if(INFRA_LOUD_MULL_FAILURE)
+        message(
+            STATUS
+                "add_mull_test(${name}) is disabled because CMAKE_CXX_COMPILER_ID is ${CMAKE_CXX_COMPILER_ID}."
+        )
+    endif()
 endfunction()
 
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -39,9 +44,6 @@ function(find_mull)
 endfunction()
 
 find_mull()
-
-option(INFRA_LOUD_MULL_FAILURE
-       "Output per-target warning when mull is not available." OFF)
 
 function(add_mull_test name)
     set(options EXCLUDE_CTEST)
