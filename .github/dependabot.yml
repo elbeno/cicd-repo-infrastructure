@@ -6,7 +6,9 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/" # Location of package manifests
+    directories:
+      - "/.github/workflows"
+      - "/ci/.github/workflows"
     schedule:
       interval: "daily"
   - package-ecosystem: "gitsubmodule"
