@@ -41,7 +41,7 @@ endmacro()
 
 macro(get_gtest)
     if(NOT TARGET gtest)
-        add_versioned_package("gh:google/googletest@1.15.2")
+        add_versioned_package("gh:google/googletest@1.16.0")
         include(GoogleTest)
     endif()
 endmacro()
@@ -53,7 +53,7 @@ macro(get_gunit)
             NAME
             gunit
             GIT_TAG
-            467b07d
+            v1.16.0
             GITHUB_REPOSITORY
             cpp-testing/GUnit
             DOWNLOAD_ONLY
@@ -63,7 +63,7 @@ endmacro()
 
 macro(get_snitch)
     if(NOT TARGET snitch::snitch)
-        add_versioned_package("gh:snitch-org/snitch@1.3.1")
+        add_versioned_package("gh:snitch-org/snitch@1.3.2")
     endif()
 endmacro()
 
@@ -84,7 +84,19 @@ endmacro()
 
 macro(add_boost_di)
     if(NOT TARGET Boost.DI)
-        add_versioned_package("gh:boost-ext/di@1.3.0")
+        add_versioned_package(
+            NAME
+            di
+            GIT_TAG
+            v1.3.1
+            GITHUB_REPOSITORY
+            boost-ext/di
+            DOWNLOAD_ONLY
+            YES)
+        add_library(Boost.DI INTERFACE)
+        target_include_directories(
+            Boost.DI INTERFACE ${di_SOURCE_DIR}/include
+                               ${di_SOURCE_DIR}/extension/include)
     endif()
 endmacro()
 
