@@ -13,9 +13,10 @@ env:
   DEBIAN_FRONTEND: noninteractive
   CMAKE_GENERATOR: Ninja
   DEFAULT_CXX_STANDARD: 20
-  DEFAULT_LLVM_VERSION: 18
+  DEFAULT_LLVM_VERSION: 20
   DEFAULT_GCC_VERSION: 13
-  MULL_LLVM_VERSION: 17
+  MULL_LLVM_VERSION: 18
+  MULL_VERSION: 0.24.0
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -28,7 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [clang, gcc]
-        version: [12, 13, 16, 17, 18]
+        version: [12, 13, 16, 17, 18, 19, 20]
         cxx_standard: [20]
         stdlib: [libstdc++, libc++]
         build_type: [Debug]
@@ -37,6 +38,24 @@ jobs:
             cc: "clang"
             cxx: "clang++"
             cxx_flags: "-stdlib=libstdc++"
+          - version: 20
+            compiler: clang
+            install: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 20
+            toolchain_root: "/usr/lib/llvm-20"
+          - version: 20
+            compiler: clang
+            stdlib: libc++
+            install: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 20 && sudo apt install -y libc++-20-dev libc++abi-20-dev
+            cxx_flags: "-stdlib=libc++"
+          - version: 19
+            compiler: clang
+            install: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19
+            toolchain_root: "/usr/lib/llvm-19"
+          - version: 19
+            compiler: clang
+            stdlib: libc++
+            install: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19 && sudo apt install -y libc++-19-dev libc++abi-19-dev
+            cxx_flags: "-stdlib=libc++"
           - version: 18
             compiler: clang
             install: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18
@@ -79,6 +98,10 @@ jobs:
             cxx: "g++-12"
             cxx_flags: ""
         exclude:
+          - compiler: gcc
+            version: 20
+          - compiler: gcc
+            version: 19
           - compiler: gcc
             version: 18
           - compiler: gcc
@@ -279,8 +302,8 @@ jobs:
           - compiler: clang
             cc: "clang"
             cxx: "clang++"
-            install: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18
-            toolchain_root: "/usr/lib/llvm-18"
+            install: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 20
+            toolchain_root: "/usr/lib/llvm-20"
           - compiler: gcc
             cc: "gcc-13"
             cxx: "g++-13"
@@ -412,11 +435,9 @@ jobs:
           sudo apt install -y ninja-build
 
       - name: Install mull
-        env:
-          MULL_VERSION: 0.23.0
         run: |
-          wget https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.0-ubuntu-24.04.deb
-          sudo dpkg -i Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.0-ubuntu-24.04.deb
+          wget https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.1-ubuntu-24.04.deb
+          sudo dpkg -i Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.1-ubuntu-24.04.deb
 
       - name: Checkout PR branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
