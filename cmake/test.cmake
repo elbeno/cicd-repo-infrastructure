@@ -84,19 +84,7 @@ endmacro()
 
 macro(add_boost_di)
     if(NOT TARGET Boost.DI)
-        add_versioned_package(
-            NAME
-            di
-            GIT_TAG
-            v1.3.1
-            GITHUB_REPOSITORY
-            boost-ext/di
-            DOWNLOAD_ONLY
-            YES)
-        add_library(Boost.DI INTERFACE)
-        target_include_directories(
-            Boost.DI INTERFACE ${di_SOURCE_DIR}/include
-                               ${di_SOURCE_DIR}/extension/include)
+        add_versioned_package("gh:boost-ext/di@1.3.2")
     endif()
 endmacro()
 
