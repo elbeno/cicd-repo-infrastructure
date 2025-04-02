@@ -59,6 +59,11 @@ if(NOT COMMAND metabench_recipe)
             ${VERSION}
             DOWNLOAD_ONLY
             YES)
+        set(policy ${CMAKE_POLICY_VERSION_MINIMUM})
+        if(NOT policy)
+            set(CMAKE_POLICY_VERSION_MINIMUM 3.27)
+        endif()
         include("${metabench_SOURCE_DIR}/metabench.cmake")
+        set(CMAKE_POLICY_VERSION_MINIMUM ${policy})
     endmacro()
 endif()
