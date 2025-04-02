@@ -18,7 +18,7 @@ on:
 env:
   DEBIAN_FRONTEND: noninteractive
   CMAKE_GENERATOR: Ninja
-  TARGET_LLVM_VERSION: 19
+  TARGET_LLVM_VERSION: 20
   MULL_LLVM_VERSION: 18
   MULL_VERSION: 0.24.0
 
@@ -33,7 +33,7 @@ jobs:
       - name: Install build tools
         run: |
           wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh ${{env.TARGET_LLVM_VERSION}}
-          sudo apt update && sudo apt install -y pipx ninja-build clang-tidy-${{env.TARGET_LLVM_VERSION}} clang-format-${{env.TARGET_LLVM_VERSION}}
+          sudo apt update && sudo apt install -y pip ninja-build clang-tidy-${{env.TARGET_LLVM_VERSION}} clang-format-${{env.TARGET_LLVM_VERSION}}
 
       - name: Setup Node.js
         uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0

@@ -7,6 +7,6 @@ function(test_recipe NAME VERSION LIBNAME)
     add_dependencies(recipe_tests ${NAME}_recipe_app)
 endfunction()
 
-test_recipe(fmt "10.2.1" fmt::fmt-header-only)
+test_recipe(fmt "11.1.4" fmt::fmt-header-only)
 test_recipe(boost_sml "v1.1.11" sml)
 test_recipe(boost_hana "boost-1.83.0" boost_hana)
