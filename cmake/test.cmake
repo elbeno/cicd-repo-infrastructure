@@ -1,10 +1,12 @@
 option(BUILD_TESTING "" OFF)
 include(CTest)
-add_custom_target(unit_tests)
-add_custom_target(cpp_tests)
-add_custom_target(python_tests)
-add_custom_target(build_unit_tests)
-add_dependencies(unit_tests cpp_tests python_tests)
+add_custom_target(${INFRA_TARGET_NAMESPACE}unit_tests)
+add_custom_target(${INFRA_TARGET_NAMESPACE}cpp_tests)
+add_custom_target(${INFRA_TARGET_NAMESPACE}python_tests)
+add_custom_target(${INFRA_TARGET_NAMESPACE}build_unit_tests)
+add_dependencies(
+    ${INFRA_TARGET_NAMESPACE}unit_tests ${INFRA_TARGET_NAMESPACE}cpp_tests
+    ${INFRA_TARGET_NAMESPACE}python_tests)
 
 set(CMAKE_TESTING_ENABLED
     1
@@ -20,8 +22,9 @@ set(MEMORYCHECK_COMMAND_OPTIONS
 configure_file(${CMAKE_ROOT}/Modules/DartConfiguration.tcl.in
                ${PROJECT_BINARY_DIR}/DartConfiguration.tcl)
 
-add_library(sanitizer-exceptions INTERFACE)
-target_compile_options(sanitizer-exceptions INTERFACE -fno-sanitize=vptr)
+add_library(${INFRA_TARGET_NAMESPACE}sanitizer-exceptions INTERFACE)
+target_compile_options(${INFRA_TARGET_NAMESPACE}sanitizer-exceptions
+                       INTERFACE -fno-sanitize=vptr)
 
 macro(get_catch2)
     if(NOT TARGET Catch2::Catch2WithMain)
@@ -30,9 +33,9 @@ macro(get_catch2)
         include(Catch)
 
         # Workaround for https://github.com/catchorg/Catch2/issues/2910
-        add_library(clean-catch2-warnings INTERFACE)
+        add_library(${INFRA_TARGET_NAMESPACE}clean-catch2-warnings INTERFACE)
         target_compile_options(
-            clean-catch2-warnings
+            ${INFRA_TARGET_NAMESPACE}clean-catch2-warnings
             INTERFACE
                 $<$<AND:$<CXX_COMPILER_ID:Clang>,$<VERSION_GREATER_EQUAL:${CMAKE_CXX_COMPILER_VERSION},19>>:-Wno-c++20-extensions>
         )
@@ -121,8 +124,8 @@ function(add_unit_test_target name)
     target_include_directories(${name} PRIVATE ${UNIT_INCLUDE_DIRECTORIES})
     target_link_libraries(${name} PRIVATE ${UNIT_LIBRARIES})
     target_link_libraries_system(${name} PRIVATE ${UNIT_SYSTEM_LIBRARIES})
-    target_link_libraries(${name} PRIVATE sanitizers)
-    add_dependencies(build_unit_tests ${name})
+    target_link_libraries(${name} PRIVATE ${INFRA_TARGET_NAMESPACE}sanitizers)
+    add_dependencies(${INFRA_TARGET_NAMESPACE}build_unit_tests ${name})
 
     if(UNIT_CATCH2)
         target_link_libraries_system(${name} PRIVATE Catch2::Catch2WithMain
@@ -142,7 +145,8 @@ function(add_unit_test_target name)
                 catch_discover_tests(${name})
             endif()
         endif()
-        target_link_libraries(${name} PRIVATE clean-catch2-warnings)
+        target_link_libraries(
+            ${name} PRIVATE ${INFRA_TARGET_NAMESPACE}clean-catch2-warnings)
     elseif(UNIT_GTEST)
         target_link_libraries_system(
             ${name}
@@ -182,7 +186,8 @@ function(add_unit_test_target name)
             rapidcheck
             rapidcheck_gtest
             rapidcheck_gmock)
-        target_link_libraries(${name} PRIVATE sanitizer-exceptions)
+        target_link_libraries(
+            ${name} PRIVATE ${INFRA_TARGET_NAMESPACE}sanitizer-exceptions)
         if(UNIT_NORANDOM)
             message(
                 WARNING
@@ -209,10 +214,10 @@ function(add_unit_test_target name)
         COMMAND ${target_test_command}
         COMMAND ${CMAKE_COMMAND} "-E" "touch" "${name}.passed"
         DEPENDS ${name})
-    add_dependencies(cpp_tests "run_${name}")
+    add_dependencies(${INFRA_TARGET_NAMESPACE}cpp_tests "run_${name}")
 
     if(UNIT_COVERAGE)
-        target_link_libraries(${name} PRIVATE coverage)
+        target_link_libraries(${name} PRIVATE ${INFRA_TARGET_NAMESPACE}coverage)
         add_test_coverage_target(${name})
     endif()
 endfunction()
@@ -279,7 +284,7 @@ function(add_python_test_target name)
                 ${auto_dependencies}
         COMMAND_EXPAND_LISTS)
 
-    add_dependencies(python_tests "run_${name}")
+    add_dependencies(${INFRA_TARGET_NAMESPACE}python_tests "run_${name}")
 endfunction()
 
 function(detect_test_framework)
@@ -328,8 +333,8 @@ function(add_feature_test_target name)
     target_include_directories(${name} PRIVATE ${FEAT_INCLUDE_DIRECTORIES})
     target_link_libraries(${name} PRIVATE ${FEAT_LIBRARIES})
     target_link_libraries_system(${name} PRIVATE ${FEAT_SYSTEM_LIBRARIES})
-    target_link_libraries(${name} PRIVATE sanitizers)
-    add_dependencies(build_unit_tests ${name})
+    target_link_libraries(${name} PRIVATE ${INFRA_TARGET_NAMESPACE}sanitizers)
+    add_dependencies(${INFRA_TARGET_NAMESPACE}build_unit_tests ${name})
 
     target_include_directories(
         ${name} SYSTEM
@@ -368,10 +373,10 @@ function(add_feature_test_target name)
         DEPENDS ${name})
 
     set_property(TEST ${name} PROPERTY ENVIRONMENT "SCENARIO=${FEATURE_FILE}")
-    add_dependencies(cpp_tests "run_${name}")
+    add_dependencies(${INFRA_TARGET_NAMESPACE}cpp_tests "run_${name}")
 
     if(UNIT_COVERAGE)
-        target_link_libraries(${name} PRIVATE coverage)
+        target_link_libraries(${name} PRIVATE ${INFRA_TARGET_NAMESPACE}coverage)
         add_test_coverage_target(${name})
     endif()
 endfunction()
@@ -393,7 +398,7 @@ function(add_fuzz_test_target name)
     target_include_directories(${name} PRIVATE ${FUZZ_INCLUDE_DIRECTORIES})
     target_link_libraries(${name} PRIVATE ${FUZZ_LIBRARIES})
     target_link_libraries_system(${name} PRIVATE ${FUZZ_SYSTEM_LIBRARIES})
-    add_dependencies(build_unit_tests ${name})
+    add_dependencies(${INFRA_TARGET_NAMESPACE}build_unit_tests ${name})
 
     target_compile_definitions(
         ${name} PRIVATE FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
@@ -437,10 +442,10 @@ function(add_fuzz_test_target name)
         COMMAND ${CMAKE_COMMAND} "-E" "touch" "${name}.passed"
         DEPENDS ${name})
 
-    add_dependencies(cpp_tests "run_${name}")
+    add_dependencies(${INFRA_TARGET_NAMESPACE}cpp_tests "run_${name}")
 
     if(UNIT_COVERAGE)
-        target_link_libraries(${name} PRIVATE coverage)
+        target_link_libraries(${name} PRIVATE ${INFRA_TARGET_NAMESPACE}coverage)
         add_test_coverage_target(${name})
     endif()
 endfunction()

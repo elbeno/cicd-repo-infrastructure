@@ -20,7 +20,7 @@ env:
   CMAKE_GENERATOR: Ninja
   TARGET_LLVM_VERSION: 20
   MULL_LLVM_VERSION: 18
-  MULL_VERSION: 0.24.0
+  MULL_VERSION: 0.26.1
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -83,19 +83,19 @@ jobs:
           CXX: "/usr/lib/llvm-${{env.TARGET_LLVM_VERSION}}/bin/clang++"
           PR_TARGET_BRANCH: ${{ steps.target_branch.outputs.branch }}
         working-directory: ${{github.workspace}}/test/library
-        run: cmake -Bbuild
+        run: cmake -Bbuild -DINFRA_TARGET_NAMESPACE=infra
 
       - name: Build lib docs
         working-directory: ${{github.workspace}}/test/library
-        run: test $(cmake --build build -v -t docs | grep -c ERROR) == 0
+        run: test $(cmake --build build -v -t infra.docs | grep -c ERROR) == 0
 
       - name: Build lib metabench tests
         working-directory: ${{github.workspace}}/test/library
-        run: cmake --build build -t metabench_tests
+        run: cmake --build build -t infra.metabench_tests
 
       - name: Check lib quality
         working-directory: ${{github.workspace}}/test/library
-        run: cmake --build build -t ci-quality
+        run: cmake --build build -t infra.ci-quality
 
       - name: Restore CPM cache
         env:
@@ -114,7 +114,7 @@ jobs:
           CXX: "/usr/lib/llvm-${{env.TARGET_LLVM_VERSION}}/bin/clang++"
           PR_TARGET_BRANCH: ${{ steps.target_branch.outputs.branch }}
         working-directory: ${{github.workspace}}/test/application
-        run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache
+        run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache -DINFRA_TARGET_NAMESPACE=infra
 
       - name: Save CPM cache
         env:
@@ -128,13 +128,13 @@ jobs:
       - name: Build app and run tests
         working-directory: ${{github.workspace}}/test/application
         run: |
-          cmake --build build -t build_unit_tests
+          cmake --build build -t infra.build_unit_tests
           ctest --output-on-failure --test-dir build
 
       - name: Run benchmarks
         working-directory: ${{github.workspace}}/test/application
         run: |
-          cmake --build build -t benchmarks
+          cmake --build build -t infra.benchmarks
 
       - name: Run recipe tests
         working-directory: ${{github.workspace}}/test/application
@@ -144,7 +144,7 @@ jobs:
       - name: Generate coverage report
         working-directory: ${{github.workspace}}/test/application
         run: |
-          cmake --build build -t cpp_coverage_report
+          cmake --build build -t infra.cpp_coverage_report
           echo "<details>" >> $GITHUB_STEP_SUMMARY
           echo "<summary>Coverage report:</summary>" >> $GITHUB_STEP_SUMMARY
           cat ./build/coverage_report.txt >> $GITHUB_STEP_SUMMARY
@@ -152,7 +152,7 @@ jobs:
 
       - name: Check app quality
         working-directory: ${{github.workspace}}/test/application
-        run: cmake --build build -t ci-quality
+        run: cmake --build build -t infra.ci-quality
 
       - name: Verify app setup
         working-directory: ${{github.workspace}}/test
@@ -190,7 +190,7 @@ jobs:
           CXX: "/usr/lib/llvm-${{env.TARGET_LLVM_VERSION}}/bin/clang++"
           SANITIZERS: ${{matrix.sanitizer}}
         working-directory: ${{github.workspace}}/test/application
-        run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache
+        run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache -DINFRA_TARGET_NAMESPACE=infra
 
       - name: Save CPM cache
         env:
@@ -210,7 +210,7 @@ jobs:
 
       - name: Build app and run tests
         working-directory: ${{github.workspace}}/test/application
-        run: cmake --build build -t cpp_tests
+        run: cmake --build build -t infra.cpp_tests
 
   mutate:
     runs-on: ${{ github.repository_owner == 'intel' && 'intel-' || '' }}ubuntu-24.04
@@ -222,8 +222,8 @@ jobs:
 
       - name: Install mull
         run: |
-          wget https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.1-ubuntu-24.04.deb
-          sudo dpkg -i Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.1-ubuntu-24.04.deb
+          wget https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.1-ubuntu-x86_64-24.04.deb
+          sudo dpkg -i Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.1-ubuntu-x86_64-24.04.deb
 
       - name: Checkout PR branch
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -244,7 +244,7 @@ jobs:
           CC: "/usr/lib/llvm-${{env.MULL_LLVM_VERSION}}/bin/clang"
           CXX: "/usr/lib/llvm-${{env.MULL_LLVM_VERSION}}/bin/clang++"
         working-directory: ${{github.workspace}}/test/application
-        run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache
+        run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache -DINFRA_TARGET_NAMESPACE=infra
 
       - name: Save CPM cache
         env:
@@ -258,7 +258,7 @@ jobs:
       - name: Build app and run mull tests
         working-directory: ${{github.workspace}}/test/application
         run: |
-          cmake --build build -t mull_tests
+          cmake --build build -t infra.mull_tests
 
   merge_ok:
     runs-on: ${{ github.repository_owner == 'intel' && 'intel-' || '' }}ubuntu-24.04

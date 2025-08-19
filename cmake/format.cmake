@@ -13,5 +13,26 @@ add_versioned_package(
     OPTIONS
     "CMAKE_FORMAT_EXCLUDE cmake/get_cpm.cmake")
 
-add_dependencies(quality check-clang-format check-cmake-format)
-add_dependencies(ci-quality check-clang-format check-cmake-format)
+if(NOT "${INFRA_TARGET_NAMESPACE}" STREQUAL "")
+    add_custom_target(${INFRA_TARGET_NAMESPACE}clang-format
+                      DEPENDS clang-format)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}check-clang-format
+                      DEPENDS check-clang-format)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}fix-clang-format
+                      DEPENDS fix-clang-format)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}cmake-format
+                      DEPENDS cmake-format)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}check-cmake-format
+                      DEPENDS check-cmake-format)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}fix-cmake-format
+                      DEPENDS fix-cmake-format)
+endif()
+
+add_dependencies(
+    ${INFRA_TARGET_NAMESPACE}quality
+    ${INFRA_TARGET_NAMESPACE}check-clang-format
+    ${INFRA_TARGET_NAMESPACE}check-cmake-format)
+add_dependencies(
+    ${INFRA_TARGET_NAMESPACE}ci-quality
+    ${INFRA_TARGET_NAMESPACE}check-clang-format
+    ${INFRA_TARGET_NAMESPACE}check-cmake-format)

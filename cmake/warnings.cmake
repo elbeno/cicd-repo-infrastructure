@@ -1,7 +1,7 @@
-add_library(warnings INTERFACE)
+add_library(${INFRA_TARGET_NAMESPACE}warnings INTERFACE)
 
 target_compile_options(
-    warnings
+    ${INFRA_TARGET_NAMESPACE}warnings
     INTERFACE
         # warnings turned on
         -Wall

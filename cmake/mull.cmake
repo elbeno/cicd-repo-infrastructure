@@ -1,4 +1,4 @@
-add_custom_target(mull_tests)
+add_custom_target(${INFRA_TARGET_NAMESPACE}mull_tests)
 
 option(INFRA_LOUD_MULL_FAILURE
        "Output per-target warning when mull is not available." OFF)
@@ -77,8 +77,10 @@ function(add_mull_test name)
                     "mull-runner-${version} not found at ${MULL_RUNNER_DIR}. mull_${name} is a failing test."
             )
         endif()
-        add_custom_target(mull_${name} ${MULL_RUNNER_NOT_FOUND_COMMAND})
-        add_dependencies(mull_tests mull_${name})
+        add_custom_target(${INFRA_TARGET_NAMESPACE}mull_${name}
+                          ${MULL_RUNNER_NOT_FOUND_COMMAND})
+        add_dependencies(${INFRA_TARGET_NAMESPACE}mull_tests
+                         ${INFRA_TARGET_NAMESPACE}mull_${name})
         return()
     endif()
 
@@ -96,17 +98,20 @@ function(add_mull_test name)
                     "mull-ir-frontend-${version} not found at ${MULL_PLUGIN_DIR}. mull_${name} is a failing test."
             )
         endif()
-        add_custom_target(mull_${name} ${MULL_PLUGIN_NOT_FOUND_COMMAND})
-        add_dependencies(mull_tests mull_${name})
+        add_custom_target(${INFRA_TARGET_NAMESPACE}mull_${name}
+                          ${MULL_PLUGIN_NOT_FOUND_COMMAND})
+        add_dependencies(${INFRA_TARGET_NAMESPACE}mull_tests
+                         ${INFRA_TARGET_NAMESPACE}mull_${name})
         return()
     endif()
 
     target_compile_options(${name} PRIVATE -fpass-plugin=${MULL_PLUGIN} -O0 -g
                                            -grecord-command-line)
-    target_link_libraries(${name} PRIVATE coverage)
+    target_link_libraries(${name} PRIVATE ${INFRA_TARGET_NAMESPACE}coverage)
 
     set(mull_test_command $<TARGET_FILE:${name}>)
-    add_custom_target(mull_${name} DEPENDS ${name}.mull)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}mull_${name}
+                      DEPENDS ${name}.mull)
     add_custom_command(
         OUTPUT ${name}.mull
         COMMAND ${MULL_RUNNER} ${MULL_RUNNER_ARGS} ${mull_test_command}
@@ -120,5 +125,6 @@ function(add_mull_test name)
                          ${mull_test_command} COMMAND_EXPAND_LISTS)
     endif()
 
-    add_dependencies(mull_tests mull_${name})
+    add_dependencies(${INFRA_TARGET_NAMESPACE}mull_tests
+                     ${INFRA_TARGET_NAMESPACE}mull_${name})
 endfunction()

@@ -1,11 +1,12 @@
-add_library(coverage INTERFACE)
+add_library(${INFRA_TARGET_NAMESPACE}coverage INTERFACE)
 target_compile_options(
-    coverage INTERFACE $<$<CXX_COMPILER_ID:Clang>:-fprofile-instr-generate>
-                       $<$<CXX_COMPILER_ID:Clang>:-fcoverage-mapping>)
-target_link_options(coverage INTERFACE
+    ${INFRA_TARGET_NAMESPACE}coverage
+    INTERFACE $<$<CXX_COMPILER_ID:Clang>:-fprofile-instr-generate>
+              $<$<CXX_COMPILER_ID:Clang>:-fcoverage-mapping>)
+target_link_options(${INFRA_TARGET_NAMESPACE}coverage INTERFACE
                     $<$<CXX_COMPILER_ID:Clang>:-fprofile-instr-generate>)
 
-add_custom_target(cpp_coverage_report)
+add_custom_target(${INFRA_TARGET_NAMESPACE}cpp_coverage_report)
 
 find_program(LLVM_PROFDATA_PROGRAM "llvm-profdata" HINTS ${CT_ROOT})
 if(LLVM_PROFDATA_PROGRAM)
@@ -14,14 +15,14 @@ if(LLVM_PROFDATA_PROGRAM)
     if(LLVM_COV_PROGRAM)
         message(STATUS "llvm-cov found at ${LLVM_COV_PROGRAM}.")
 
-        add_custom_target(cpp_coverage)
+        add_custom_target(${INFRA_TARGET_NAMESPACE}cpp_coverage)
         add_custom_command(
             OUTPUT ${PROJECT_BINARY_DIR}/combined.profdata
             COMMAND
                 "${LLVM_PROFDATA_PROGRAM}" merge -sparse
                 ${PROJECT_BINARY_DIR}/coverage/*.profdata -o
                 ${PROJECT_BINARY_DIR}/combined.profdata
-            DEPENDS cpp_coverage)
+            DEPENDS ${INFRA_TARGET_NAMESPACE}cpp_coverage)
 
         add_custom_command(
             OUTPUT ${PROJECT_BINARY_DIR}/coverage_report.txt
@@ -29,14 +30,15 @@ if(LLVM_PROFDATA_PROGRAM)
                 "${LLVM_COV_PROGRAM}" report -show-instantiation-summary
                 $<$<VERSION_GREATER_EQUAL:${CMAKE_CXX_COMPILER_VERSION},18>:-show-mcdc-summary>
                 -instr-profile=${PROJECT_BINARY_DIR}/combined.profdata
-                $<LIST:TRANSFORM,$<TARGET_GENEX_EVAL:cpp_coverage,$<TARGET_PROPERTY:cpp_coverage,COVERAGE_OBJECTS>>,PREPEND,--object=>
+                $<LIST:TRANSFORM,$<TARGET_GENEX_EVAL:${INFRA_TARGET_NAMESPACE}cpp_coverage,$<TARGET_PROPERTY:${INFRA_TARGET_NAMESPACE}cpp_coverage,COVERAGE_OBJECTS>>,PREPEND,--object=>
                 > ${PROJECT_BINARY_DIR}/coverage_report.txt
             COMMAND_EXPAND_LISTS VERBATIM
             DEPENDS ${PROJECT_BINARY_DIR}/combined.profdata)
-        add_custom_target(cpp_cov_report
+        add_custom_target(${INFRA_TARGET_NAMESPACE}cpp_cov_report
                           DEPENDS ${PROJECT_BINARY_DIR}/coverage_report.txt)
 
-        add_dependencies(cpp_coverage_report cpp_cov_report)
+        add_dependencies(${INFRA_TARGET_NAMESPACE}cpp_coverage_report
+                         ${INFRA_TARGET_NAMESPACE}cpp_cov_report)
     else()
         message(
             STATUS
@@ -68,7 +70,8 @@ function(add_test_coverage_target name)
             COMMAND env "LLVM_PROFILE_FILE=coverage/${name}.profraw"
                     $<TARGET_FILE:${name}>
             DEPENDS run_${name})
-        add_custom_target(raw_coverage_${name} DEPENDS coverage/${name}.profraw)
+        add_custom_target(${INFRA_TARGET_NAMESPACE}raw_coverage_${name}
+                          DEPENDS coverage/${name}.profraw)
 
         add_custom_command(
             OUTPUT ${PROJECT_BINARY_DIR}/coverage/${name}.profdata
@@ -76,9 +79,9 @@ function(add_test_coverage_target name)
                 "${LLVM_PROFDATA_PROGRAM}" merge -sparse
                 coverage/${name}.profraw -o
                 ${PROJECT_BINARY_DIR}/coverage/${name}.profdata
-            DEPENDS raw_coverage_${name})
+            DEPENDS ${INFRA_TARGET_NAMESPACE}raw_coverage_${name})
         add_custom_target(
-            indexed_coverage_${name}
+            ${INFRA_TARGET_NAMESPACE}indexed_coverage_${name}
             DEPENDS ${PROJECT_BINARY_DIR}/coverage/${name}.profdata)
 
         add_custom_command(
@@ -90,14 +93,15 @@ function(add_test_coverage_target name)
                 -object $<TARGET_FILE:${name}> >
                 ${PROJECT_BINARY_DIR}/coverage/${name}.coverage_report.txt
             COMMAND_EXPAND_LISTS VERBATIM
-            DEPENDS indexed_coverage_${name})
+            DEPENDS ${INFRA_TARGET_NAMESPACE}indexed_coverage_${name})
         add_custom_target(
-            coverage_report_${name}
+            ${INFRA_TARGET_NAMESPACE}coverage_report_${name}
             DEPENDS ${PROJECT_BINARY_DIR}/coverage/${name}.coverage_report.txt)
 
-        add_dependencies(cpp_coverage "indexed_coverage_${name}")
+        add_dependencies(${INFRA_TARGET_NAMESPACE}cpp_coverage
+                         "${INFRA_TARGET_NAMESPACE}indexed_coverage_${name}")
         set_property(
-            TARGET cpp_coverage
+            TARGET ${INFRA_TARGET_NAMESPACE}cpp_coverage
             APPEND
             PROPERTY COVERAGE_OBJECTS $<TARGET_FILE:${name}>)
     endif()

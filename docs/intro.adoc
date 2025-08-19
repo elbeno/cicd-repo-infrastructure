@@ -58,3 +58,17 @@ Auto-updates will not occur in the following circumstances:
 - `INFRA_SELF_UPDATE` is `OFF`
 - This repository is not fetched with CPM
 - You're using a filesystem copy rather than from a remote repository
+
+=== Generated targets
+
+Using the code in this repository causes targets to be generated, and it is
+possible those targets may clash with other targets from outside this
+repository. To avoid clashing targets, set the CMake variable
+`INFRA_TARGET_NAMESPACE` before including this code.
+
+[source,bash]
+----
+$ cmake -Bbuild -DINFRA_TARGET_NAMESPACE=infra
+...
+$ ninja -C build infra.unit_tests
+----
