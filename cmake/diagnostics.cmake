@@ -1,7 +1,7 @@
-add_library(diagnostics INTERFACE)
+add_library(${INFRA_TARGET_NAMESPACE}diagnostics INTERFACE)
 
 target_compile_options(
-    diagnostics
+    ${INFRA_TARGET_NAMESPACE}diagnostics
     INTERFACE
         $<$<CXX_COMPILER_ID:Clang>:-ferror-limit=8>
         $<$<CXX_COMPILER_ID:GNU>:-fmax-errors=8>

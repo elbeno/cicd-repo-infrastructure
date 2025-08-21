@@ -17,18 +17,21 @@ endif()
 find_program(CLANG_TIDY_PROGRAM "clang-tidy" HINTS ${CT_ROOT})
 if(CLANG_TIDY_PROGRAM)
     message(STATUS "clang-tidy found at ${CLANG_TIDY_PROGRAM}.")
-    add_custom_target(clang-tidy)
-    add_custom_target(clang-tidy-branch-diff)
-    add_dependencies(quality clang-tidy)
-    add_dependencies(ci-quality clang-tidy-branch-diff)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}clang-tidy)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}clang-tidy-branch-diff)
+    add_dependencies(${INFRA_TARGET_NAMESPACE}quality
+                     ${INFRA_TARGET_NAMESPACE}clang-tidy)
+    add_dependencies(${INFRA_TARGET_NAMESPACE}ci-quality
+                     ${INFRA_TARGET_NAMESPACE}clang-tidy-branch-diff)
 else()
     message(STATUS "clang-tidy not found. Adding dummy target.")
     set(CLANG_TIDY_NOT_FOUND_COMMAND_ARGS
         COMMAND ${CMAKE_COMMAND} -E echo
         "Cannot run clang-tidy because clang-tidy not found." COMMAND
         ${CMAKE_COMMAND} -E false)
-    add_custom_target(clang-tidy ${CLANG_TIDY_NOT_FOUND_COMMAND_ARGS})
-    add_custom_target(clang-tidy-branch-diff
+    add_custom_target(${INFRA_TARGET_NAMESPACE}clang-tidy
+                      ${CLANG_TIDY_NOT_FOUND_COMMAND_ARGS})
+    add_custom_target(${INFRA_TARGET_NAMESPACE}clang-tidy-branch-diff
                       ${CLANG_TIDY_NOT_FOUND_COMMAND_ARGS})
     return()
 endif()
@@ -38,7 +41,7 @@ set(CREATE_CLANG_TIDIABLE_SCRIPT
     CACHE STRING "" FORCE)
 
 function(clang_tidy_header HEADER TARGET)
-    filename_to_target(${HEADER} CT_NAME "clang-tidy_")
+    filename_to_target(${HEADER} CT_NAME "${INFRA_TARGET_NAMESPACE}clang-tidy_")
     set(CPP_NAME
         "${CMAKE_BINARY_DIR}/generated-sources/${TARGET}/${CT_NAME}.cpp")
 
@@ -58,7 +61,7 @@ function(clang_tidy_header HEADER TARGET)
             "${CLANG_TIDY_PROGRAM};-p;${CMAKE_BINARY_DIR};-header-filter=${HEADER}"
     )
 
-    add_dependencies(clang-tidy "${CT_NAME}")
+    add_dependencies(${INFRA_TARGET_NAMESPACE}clang-tidy "${CT_NAME}")
 endfunction()
 
 function(clang_tidy_dirs TARGET EXCLUDE_DIRS EXCLUDE_FILES)
@@ -126,10 +129,10 @@ function(clang_tidy_interface)
         clang_tidy_dirs(${CT_TARGET} "${CT_EXCLUDE_DIRS}" "${CT_EXCLUDE_FILES}")
     endif()
 
-    compute_branch_diff(clang-tidy ".hpp")
+    compute_branch_diff(${INFRA_TARGET_NAMESPACE}clang-tidy ".hpp")
 endfunction()
 
-if(NOT TARGET clang-tidy-canary)
+if(NOT TARGET ${INFRA_TARGET_NAMESPACE}clang-tidy-canary)
     message(STATUS "Adding clang-tidy-canary target for ${CMAKE_SOURCE_DIR}")
     add_custom_command(
         OUTPUT clang_tidy_canary.alive
@@ -137,7 +140,10 @@ if(NOT TARGET clang-tidy-canary)
         COMMAND "!" "[" "-s" "clang_tidy.log" "]"
         COMMAND ${CMAKE_COMMAND} "-E" "touch" "clang_tidy_canary.alive"
         DEPENDS ${CMAKE_SOURCE_DIR}/.clang-tidy)
-    add_custom_target(clang-tidy-canary DEPENDS clang_tidy_canary.alive)
-    add_dependencies(clang-tidy clang-tidy-canary)
-    add_dependencies(clang-tidy-branch-diff clang-tidy-canary)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}clang-tidy-canary
+                      DEPENDS clang_tidy_canary.alive)
+    add_dependencies(${INFRA_TARGET_NAMESPACE}clang-tidy
+                     ${INFRA_TARGET_NAMESPACE}clang-tidy-canary)
+    add_dependencies(${INFRA_TARGET_NAMESPACE}clang-tidy-branch-diff
+                     ${INFRA_TARGET_NAMESPACE}clang-tidy-canary)
 endif()

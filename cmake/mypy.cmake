@@ -5,18 +5,22 @@ endfunction()
 find_program(MYPY_PROGRAM "mypy")
 if(MYPY_PROGRAM)
     message(STATUS "mypy found at ${MYPY_PROGRAM}")
-    add_custom_target(mypy-lint)
-    add_custom_target(mypy-lint-branch-diff)
-    add_dependencies(quality mypy-lint)
-    add_dependencies(ci-quality mypy-lint-branch-diff)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}mypy-lint)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}mypy-lint-branch-diff)
+    add_dependencies(${INFRA_TARGET_NAMESPACE}quality
+                     ${INFRA_TARGET_NAMESPACE}mypy-lint)
+    add_dependencies(${INFRA_TARGET_NAMESPACE}ci-quality
+                     ${INFRA_TARGET_NAMESPACE}mypy-lint-branch-diff)
 else()
     message(STATUS "mypy not found. Adding dummy target.")
     set(MYPY_NOT_FOUND_COMMAND_ARGS
         COMMAND ${CMAKE_COMMAND} -E echo
         "Cannot run mypy because mypy not found." COMMAND ${CMAKE_COMMAND} -E
         false)
-    add_custom_target(mypy-lint ${MYPY_NOT_FOUND_COMMAND_ARGS})
-    add_custom_target(mypy-lint-branch-diff ${MYPY_NOT_FOUND_COMMAND_ARGS})
+    add_custom_target(${INFRA_TARGET_NAMESPACE}mypy-lint
+                      ${MYPY_NOT_FOUND_COMMAND_ARGS})
+    add_custom_target(${INFRA_TARGET_NAMESPACE}mypy-lint-branch-diff
+                      ${MYPY_NOT_FOUND_COMMAND_ARGS})
     return()
 endif()
 
@@ -29,7 +33,7 @@ function(mypy_lint)
 
     foreach(file ${ML_FILES})
         file(REAL_PATH ${file} file)
-        filename_to_target(${file} target "mypy-lint_")
+        filename_to_target(${file} target "${INFRA_TARGET_NAMESPACE}mypy-lint_")
         set(artifact "${CMAKE_CURRENT_BINARY_DIR}/${target}.linted")
 
         add_custom_target(${target} DEPENDS ${artifact})
@@ -41,8 +45,8 @@ function(mypy_lint)
             DEPENDS ${file}
             COMMAND_EXPAND_LISTS
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-        add_dependencies(mypy-lint ${target})
+        add_dependencies(${INFRA_TARGET_NAMESPACE}mypy-lint ${target})
     endforeach()
 
-    compute_branch_diff(mypy-lint ".py")
+    compute_branch_diff(${INFRA_TARGET_NAMESPACE}mypy-lint ".py")
 endfunction()

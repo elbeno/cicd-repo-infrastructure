@@ -5,8 +5,8 @@ add_unit_test(
     FILES
     catch2_test.cpp
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
 add_mull_test(catch2_test EXCLUDE_CTEST RUNNER_ARGS --allow-surviving)
 
 add_unit_test(
@@ -16,8 +16,8 @@ add_unit_test(
     FILES
     gtest_test.cpp
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
 
 add_unit_test(
     gunit_test
@@ -26,8 +26,8 @@ add_unit_test(
     FILES
     gunit_test.cpp
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
 target_compile_features(gunit_test PRIVATE cxx_std_17)
 
 add_unit_test(
@@ -37,8 +37,8 @@ add_unit_test(
     FILES
     snitch_test.cpp
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
 
 add_unit_test(
     custom_test
@@ -46,8 +46,8 @@ add_unit_test(
     FILES
     custom_test.cpp
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
 
 add_feature_test(
     gunit_feature_test
@@ -57,8 +57,8 @@ add_feature_test(
     FEATURE
     test.feature
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
 
 add_fuzz_test(
     fuzz_test
@@ -66,12 +66,15 @@ add_fuzz_test(
     FILES
     fuzz_test.cpp
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
 
-add_compile_fail_test(compile_fail_test.cpp LIBRARIES diagnostics warnings)
-add_compile_fail_test(compile_fail_test_no_pattern.cpp LIBRARIES diagnostics
-                      warnings)
+add_compile_fail_test(
+    compile_fail_test.cpp LIBRARIES ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
+add_compile_fail_test(
+    compile_fail_test_no_pattern.cpp LIBRARIES
+    ${INFRA_TARGET_NAMESPACE}diagnostics ${INFRA_TARGET_NAMESPACE}warnings)
 
 add_unit_test(
     nonrandom_test
@@ -81,8 +84,8 @@ add_unit_test(
     FILES
     nonrandom_test.cpp
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)
 
 add_unit_test(pytest_test PYTEST FILES pytest_test.py EXTRA_ARGS --pass)
 mypy_lint(FILES pytest_test.py)
@@ -93,5 +96,5 @@ add_benchmark(
     FILES
     nanobm_test.cpp
     LIBRARIES
-    diagnostics
-    warnings)
+    ${INFRA_TARGET_NAMESPACE}diagnostics
+    ${INFRA_TARGET_NAMESPACE}warnings)

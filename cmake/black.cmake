@@ -11,8 +11,10 @@ else()
         COMMAND ${CMAKE_COMMAND} -E echo
         "Cannot run black because black not found." COMMAND ${CMAKE_COMMAND} -E
         false)
-    add_custom_target(check-black-format ${BLACK_NOT_FOUND_COMMAND_ARGS})
-    add_custom_target(fix-black-format ${BLACK_NOT_FOUND_COMMAND_ARGS})
+    add_custom_target(${INFRA_TARGET_NAMESPACE}check-black-format
+                      ${BLACK_NOT_FOUND_COMMAND_ARGS})
+    add_custom_target(${INFRA_TARGET_NAMESPACE}fix-black-format
+                      ${BLACK_NOT_FOUND_COMMAND_ARGS})
     return()
 endif()
 
@@ -29,7 +31,7 @@ function(add_black_format_target name)
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     add_custom_target(
-        "${name}-black-format"
+        "${INFRA_TARGET_NAMESPACE}${name}-black-format"
         COMMAND
             ${CMAKE_COMMAND} "-DGIT_PROGRAM=${GIT_PROGRAM}"
             "-DBLACK_PROGRAM=${BLACK_PROGRAM}" "-DFORMAT_FUNC=${name}"
@@ -39,5 +41,7 @@ endfunction()
 
 add_black_format_target("check")
 add_black_format_target("fix")
-add_dependencies(quality check-black-format)
-add_dependencies(ci-quality check-black-format)
+add_dependencies(${INFRA_TARGET_NAMESPACE}quality
+                 ${INFRA_TARGET_NAMESPACE}check-black-format)
+add_dependencies(${INFRA_TARGET_NAMESPACE}ci-quality
+                 ${INFRA_TARGET_NAMESPACE}check-black-format)

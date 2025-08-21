@@ -1,4 +1,4 @@
-add_library(sanitizers INTERFACE)
+add_library(${INFRA_TARGET_NAMESPACE}sanitizers INTERFACE)
 
 if(DEFINED ENV{SANITIZERS})
     set(SANITIZERS $ENV{SANITIZERS})
@@ -6,21 +6,23 @@ endif()
 
 if(SANITIZERS)
     target_compile_options(
-        sanitizers
+        ${INFRA_TARGET_NAMESPACE}sanitizers
         INTERFACE -g -fno-omit-frame-pointer -fno-optimize-sibling-calls
                   -fsanitize=${SANITIZERS} -fno-sanitize-recover=${SANITIZERS})
 
     string(REGEX MATCH "memory" SANITIZER_MEMORY "${SANITIZERS}")
     if(SANITIZER_MEMORY)
-        target_compile_options(sanitizers
+        target_compile_options(${INFRA_TARGET_NAMESPACE}sanitizers
                                INTERFACE -fsanitize-memory-track-origins)
     endif()
 
     string(REGEX MATCH "address|memory|thread" SANITIZER_NEW_DEL
                  "${SANITIZERS}")
     if(SANITIZER_NEW_DEL)
-        target_compile_definitions(sanitizers INTERFACE SANITIZER_NEW_DEL)
+        target_compile_definitions(${INFRA_TARGET_NAMESPACE}sanitizers
+                                   INTERFACE SANITIZER_NEW_DEL)
     endif()
 
-    target_link_options(sanitizers INTERFACE -fsanitize=${SANITIZERS})
+    target_link_options(${INFRA_TARGET_NAMESPACE}sanitizers INTERFACE
+                        -fsanitize=${SANITIZERS})
 endif()

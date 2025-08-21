@@ -47,6 +47,15 @@ if(${PROJECT_SOURCE_DIR}/cmake STREQUAL CMAKE_CURRENT_LIST_DIR)
     set(INFRA_PROVIDE_GITIGNORE OFF)
 endif()
 
+if(DEFINED INFRA_TARGET_NAMESPACE)
+    if(NOT INFRA_TARGET_NAMESPACE MATCHES "\\.$")
+        set(INFRA_TARGET_NAMESPACE
+            "${INFRA_TARGET_NAMESPACE}."
+            CACHE STRING
+                  "Prefix namespace for infrastructure-generated targets" FORCE)
+    endif()
+endif()
+
 include(${CMAKE_CURRENT_LIST_DIR}/cpm_recipes.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/dependencies.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/libraries.cmake)

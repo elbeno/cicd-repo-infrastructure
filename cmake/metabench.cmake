@@ -2,7 +2,7 @@ if(COMMAND add_metabench_profile)
     return()
 endif()
 
-add_custom_target(metabench_tests)
+add_custom_target(${INFRA_TARGET_NAMESPACE}metabench_tests)
 
 macro(get_metabench)
     if(NOT COMMAND metabench_add_chart)
@@ -19,6 +19,7 @@ function(add_mb_profile)
 
     foreach(template ${MB_TEMPLATES})
         string(REPLACE "/" "_" dataset ${template})
+        set(dataset "${INFRA_TARGET_NAMESPACE}${dataset}")
         metabench_add_dataset(${dataset} "${template}" "${MB_RANGE}" NAME
                               ${dataset} ${MB_DS_ARGS})
         target_include_directories(${dataset} PRIVATE ${MB_INCLUDE_DIRECTORIES})
@@ -27,7 +28,7 @@ function(add_mb_profile)
     endforeach()
 
     metabench_add_chart(${MB_TARGET} DATASETS ${datasets} ${MB_CHART_ARGS})
-    add_dependencies(metabench_tests ${MB_TARGET})
+    add_dependencies(${INFRA_TARGET_NAMESPACE}metabench_tests ${MB_TARGET})
 endfunction()
 
 macro(add_metabench_profile)
@@ -117,7 +118,8 @@ function(add_mb_comparison)
     endif()
 
     string(REPLACE "/" "_" dataset ${MB_TEMPLATE})
-    foreach(alt in ITEMS old new)
+    foreach(alt in ITEMS ${INFRA_TARGET_NAMESPACE}old
+                         ${INFRA_TARGET_NAMESPACE}new)
         metabench_add_dataset(
             "${alt}_${dataset}" "${MB_TEMPLATE}" "${MB_RANGE}" NAME
             "${alt}_${dataset}" ${MB_DS_ARGS})
@@ -125,11 +127,15 @@ function(add_mb_comparison)
                                    PRIVATE ${MB_INCLUDE_DIRECTORIES})
         target_link_libraries("${alt}_${dataset}" PRIVATE ${MB_LIBRARIES})
     endforeach()
-    target_link_libraries("old_${dataset}" PRIVATE ${orig_lib})
-    target_link_libraries("new_${dataset}" PRIVATE ${MB_LIBRARY})
+    target_link_libraries("${INFRA_TARGET_NAMESPACE}old_${dataset}"
+                          PRIVATE ${orig_lib})
+    target_link_libraries("${INFRA_TARGET_NAMESPACE}new_${dataset}"
+                          PRIVATE ${MB_LIBRARY})
 
-    metabench_add_chart(${MB_TARGET} DATASETS old_${dataset} new_${dataset}
-                        ${MB_CHART_ARGS})
+    metabench_add_chart(
+        ${MB_TARGET} DATASETS ${INFRA_TARGET_NAMESPACE}old_${dataset}
+        ${INFRA_TARGET_NAMESPACE}new_${dataset} ${MB_CHART_ARGS})
+    add_dependencies(${INFRA_TARGET_NAMESPACE}metabench_tests ${MB_TARGET})
 endfunction()
 
 macro(add_metabench_comparison)

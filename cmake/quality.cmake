@@ -1,10 +1,10 @@
-if(TARGET quality)
+if(TARGET ${INFRA_TARGET_NAMESPACE}quality)
     return()
 endif()
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    add_custom_target(quality)
-    add_custom_target(ci-quality)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}quality)
+    add_custom_target(${INFRA_TARGET_NAMESPACE}ci-quality)
 
     get_filename_component(CT_ROOT ${CMAKE_CXX_COMPILER} DIRECTORY)
 
