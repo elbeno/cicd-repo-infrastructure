@@ -34,6 +34,7 @@ Checks: >
   -modernize-concat-nested-namespaces,
   performance-*,
   portability-*,
+  -portability-avoid-pragma-once,
   readability-*,
   -readability-identifier-length,
   -readability-identifier-naming,
@@ -45,4 +46,7 @@ Checks: >
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle: file
+CheckOptions:
+  - key: modernize-use-trailing-return-type.TransformLambdas
+    value: 'all_except_auto'
 ...
