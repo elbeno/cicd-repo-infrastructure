@@ -22,12 +22,14 @@ target_compile_options(
         $<$<CXX_COMPILER_ID:Clang>:-Widiomatic-parentheses>
         $<$<CXX_COMPILER_ID:Clang>:-Wimplicit-fallthrough>
         $<$<CXX_COMPILER_ID:GNU>:-Wlogical-op>
+        $<$<CXX_COMPILER_ID:Clang>:-Wmissing-prototypes>
         $<$<CXX_COMPILER_ID:Clang>:-Wnewline-eof>
+        $<$<AND:$<CXX_COMPILER_ID:Clang>,$<VERSION_GREATER_EQUAL:${CMAKE_CXX_COMPILER_VERSION},21>>:-Wnrvo>
+        $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_GREATER_EQUAL:${CMAKE_CXX_COMPILER_VERSION},14>>:-Wnrvo>
         -Wold-style-cast
         -Woverloaded-virtual
         $<$<CXX_COMPILER_ID:Clang>:-Wpedantic>
         -Wshadow
         $<$<CXX_COMPILER_ID:Clang>:-Wshift-sign-overflow>
         $<$<CXX_COMPILER_ID:GNU>:-Wuseless-cast>
-        -Wunused
-        $<$<CXX_COMPILER_ID:Clang>:-Wmissing-prototypes>)
+        -Wunused)
