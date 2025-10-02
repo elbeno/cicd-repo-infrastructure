@@ -56,13 +56,14 @@ function(add_docs DIRECTORY)
     endif()
 
     file(GLOB_RECURSE doc_files ${CMAKE_SOURCE_DIR}/${rel_dir}/*.adoc)
+    file(GLOB_RECURSE mmd_files ${CMAKE_SOURCE_DIR}/${rel_dir}/*.mmd)
     add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/${rel_dir}/index.html
         COMMAND
             ${ASCIIDOCTOR_PROGRAM} -r asciidoctor-diagram
             ${CMAKE_SOURCE_DIR}/${rel_dir}/index.adoc -D
             ${CMAKE_BINARY_DIR}/${rel_dir}
-        DEPENDS ${doc_files})
+        DEPENDS ${doc_files} ${mmd_files})
     add_dependencies(${INFRA_TARGET_NAMESPACE}docs
                      ${INFRA_TARGET_NAMESPACE}docs_${target})
 endfunction()
