@@ -32,6 +32,9 @@ option(
     INFRA_PROVIDE_PUPPETEER_CONFIG
     "Provide puppeteer_config.json for generating mermaid diagrams in documentation"
     ON)
+option(INFRA_PROVIDE_MERMAID_CONFIG
+       "Provide mermaid.conf for generating mermaid diagrams in documentation"
+       ON)
 option(INFRA_PROVIDE_GITIGNORE "Add provided things to .gitignore" ON)
 option(INFRA_USE_SYMLINKS "Use symlinks to provide common files" ON)
 
@@ -44,6 +47,7 @@ if(${PROJECT_SOURCE_DIR}/cmake STREQUAL CMAKE_CURRENT_LIST_DIR)
     set(INFRA_PROVIDE_MULL OFF)
     set(INFRA_PROVIDE_PYTEST_REQS OFF)
     set(INFRA_PROVIDE_PUPPETEER_CONFIG OFF)
+    set(INFRA_PROVIDE_MERMAID_CONFIG OFF)
     set(INFRA_PROVIDE_GITIGNORE OFF)
 endif()
 
