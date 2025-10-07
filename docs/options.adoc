@@ -36,6 +36,16 @@ When `ON`, this repository provides a `requirements.txt` file at the root level.
 When used with `pip install -r requirements.txt` this provides the packages
 sufficient to run python tests.
 
+*`INFRA_PROVIDE_PUPPETEER_CONFIG`*
+
+When `ON`, this repository provides a `puppeteer_config.json` file in the docs
+directory. This configures puppeteer to build documentation.
+
+*`INFRA_PROVIDE_MERMAID_CONFIG`*
+
+When `ON`, this repository provides a `mermaid.conf` file in the docs
+directory. This configures mermaid to build diagrams.
+
 *`INFRA_PROVIDE_GITIGNORE`*
 
 When `ON`, this repository provides a `.gitignore` file at the root level. It

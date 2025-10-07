@@ -41,7 +41,7 @@ An example of a Mermaid diagram specified in AsciiDoctor:
 
 [source, asciidoctor]
 ....
-[mermaid, format="svg"]
+[mermaid, format="svg" config="mermaid.conf"]
 ----
 graph LR
     A[Square Rect] -- Link text --> B((Circle))
@@ -53,7 +53,7 @@ graph LR
 
 And its output:
 
-[mermaid, format="svg"]
+[mermaid, format="svg" config="mermaid.conf"]
 ----
 graph LR
     A[Square Rect] -- Link text --> B((Circle))
