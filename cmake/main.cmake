@@ -7,6 +7,8 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
             "In-source builds are a bad idea. Please make a build directory instead. "
             "You should now remove the leftover files: CMakeCache.txt and CMakeFiles/."
     )
+else()
+    file(WRITE ${PROJECT_BINARY_DIR}/.gitignore "*")
 endif()
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
