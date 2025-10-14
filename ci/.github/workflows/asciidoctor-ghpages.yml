@@ -40,15 +40,10 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Mermaid
+      - name: Install Asciidoctor & Mermaid
         run: |
           npm install -g @mermaid-js/mermaid-cli@11.12.0
           npx puppeteer browsers install chrome-headless-shell
-
-      - name: Install asciidoctor
-        run: |
-          sudo apt update
-          sudo apt install -y asciidoctor
           sudo gem install asciidoctor asciidoctor-diagram rouge
 
       - name: Restore CPM cache
