@@ -72,3 +72,39 @@ $ cmake -Bbuild -DINFRA_TARGET_NAMESPACE=infra
 ...
 $ ninja -C build infra.unit_tests
 ----
+
+=== Command-line build patterns
+
+Building a project that uses this repository typically goes as follows --
+assuming we are starting from a fresh clone:
+
+[source,sh]
+----
+# The first cmake run will download dependencies including the CI/CD repo.
+# It will also (according to options) populate symlinks like .clang-format
+# and the toolchains directory.
+# This only needs to happen once.
+$ cmake -Bbuild
+
+# This second run of cmake may happen regularly during development.
+# Here we select typical sanitizer options and the toolchain we want.
+$ SANITIZERS=undefined,address TOOLCHAIN_ROOT=/usr/lib/llvm-21 cmake --preset clang --fresh
+
+# Now we are ready to build and iterate.
+$ cmake --build build --target unit_tests
+----
+
+Building documentation uses https://asciidoctor.org/[Asciidoctor] and (maybe)
+https://mermaid.js.org/[Mermaid] which will require their own installation
+steps, e.g.
+
+[source,sh]
+----
+# Asciidoctor is a ruby gem
+$ gem install asciidoctor asciidoctor-diagram rouge
+
+# Mermaid is an NPM package
+$ npm install @mermaid-js/mermaid-cli@11.12.0
+
+$ cmake --build build --target docs
+----
