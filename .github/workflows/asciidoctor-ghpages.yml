@@ -38,17 +38,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Install Mermaid
+      - name: Install Asciidoctor & Mermaid
         run: |
           npm install -g @mermaid-js/mermaid-cli@11.12.0
           npx puppeteer browsers install chrome-headless-shell
-
-      - name: Install asciidoctor
-        run: |
-          sudo apt update
-          sudo apt install -y asciidoctor
           sudo gem install asciidoctor asciidoctor-diagram rouge
 
       - name: Restore CPM cache
