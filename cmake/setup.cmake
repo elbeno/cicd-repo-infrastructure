@@ -4,7 +4,7 @@ endif()
 
 function(make_gitignore)
     set(GITIGNORE_CONTENTS
-        "/build"
+        "build/"
         "/cmake-build-*"
         "/venv"
         "/.vscode"
@@ -58,15 +58,32 @@ function(make_gitignore)
         endif()
     endif()
 
-    string(REPLACE ";" "\n" GITIGNORE_CONTENTS "${GITIGNORE_CONTENTS}")
-
     if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.gitignore")
+        message("${CMAKE_SOURCE_DIR}/.gitignore doesn't exist, writing fresh")
+        string(REGEX REPLACE ";$" "" GITIGNORE_CONTENTS "${GITIGNORE_CONTENTS}")
+        string(REPLACE ";" "\n" GITIGNORE_CONTENTS "${GITIGNORE_CONTENTS}")
         execute_process(COMMAND ${CMAKE_COMMAND} -E echo ${GITIGNORE_CONTENTS}
                         OUTPUT_FILE "${CMAKE_SOURCE_DIR}/.gitignore")
     else()
-        message(
-            "${CMAKE_SOURCE_DIR}/.gitignore exists, not overwriting -- this may result in git taking notice of symlinks"
-        )
+        file(READ "${CMAKE_SOURCE_DIR}/.gitignore" EXISTING)
+        string(REPLACE "\n" ";" EXISTING "${EXISTING}")
+        string(REGEX REPLACE ";$" "" EXISTING "${EXISTING}")
+
+        foreach(LINE ${GITIGNORE_CONTENTS})
+            if(NOT LINE IN_LIST EXISTING)
+                list(APPEND EXISTING ${LINE})
+                message("Adding ${LINE} to .gitignore")
+                set(GI_UPDATE 1)
+            endif()
+        endforeach()
+
+        if(GI_UPDATE)
+            string(REPLACE ";" "\n" EXISTING "${EXISTING}")
+            execute_process(COMMAND ${CMAKE_COMMAND} -E echo ${EXISTING}
+                            OUTPUT_FILE "${CMAKE_SOURCE_DIR}/.gitignore")
+        else()
+            message("${CMAKE_SOURCE_DIR}/.gitignore exists, no new entries")
+        endif()
     endif()
 endfunction()
 
