@@ -4,13 +4,13 @@ endif()
 
 function(make_gitignore)
     set(GITIGNORE_CONTENTS
-        "build/"
-        "/cmake-build-*"
-        "/venv"
-        "/.vscode"
-        "/.idea"
-        "/.cache"
-        "/.DS_Store")
+        "**/.*/"
+        "**/build*/"
+        "**/*build/"
+        "**/cmake-build-*/"
+        "**/venv*/"
+        "**/*venv/"
+        "**/__pycache__/")
 
     if(INFRA_USE_SYMLINKS)
         if(INFRA_PROVIDE_CLANG_FORMAT)
