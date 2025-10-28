@@ -15,8 +15,9 @@ env:
   DEFAULT_CXX_STANDARD: 20
   DEFAULT_LLVM_VERSION: 21
   DEFAULT_GCC_VERSION: 14
-  MULL_LLVM_VERSION: 18
-  MULL_VERSION: 0.24.0
+  MULL_LLVM_MAJOR_VERSION: 19
+  MULL_LLVM_VERSION: 19.1.1
+  MULL_VERSION: 0.27.1
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -449,13 +450,15 @@ jobs:
     steps:
       - name: Install build tools
         run: |
-          wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh ${{env.MULL_LLVM_VERSION}}
+          wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh ${{env.MULL_LLVM_MAJOR_VERSION}}
           sudo apt install -y ninja-build
 
       - name: Install mull
+        env:
+          mull-pkg: Mull-${{env.MULL_LLVM_MAJOR_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}-ubuntu-amd64-24.04.deb
         run: |
-          wget https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.1-ubuntu-24.04.deb
-          sudo dpkg -i Mull-${{env.MULL_LLVM_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}.1-ubuntu-24.04.deb
+          wget https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/${{env.mull-pkg}}
+          sudo dpkg -i ${{env.mull-pkg}}
 
       - name: Checkout PR branch
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -473,8 +476,8 @@ jobs:
 
       - name: Configure CMake
         env:
-          CC: "/usr/lib/llvm-${{env.MULL_LLVM_VERSION}}/bin/clang"
-          CXX: "/usr/lib/llvm-${{env.MULL_LLVM_VERSION}}/bin/clang++"
+          CC: "/usr/lib/llvm-${{env.MULL_LLVM_MAJOR_VERSION}}/bin/clang"
+          CXX: "/usr/lib/llvm-${{env.MULL_LLVM_MAJOR_VERSION}}/bin/clang++"
         working-directory: ${{github.workspace}}/test/application
         run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache
 
