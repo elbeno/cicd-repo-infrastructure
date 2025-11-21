@@ -5,6 +5,7 @@ endif()
 function(make_gitignore)
     set(GITIGNORE_CONTENTS
         "**/.*/"
+        "!.github/"
         "**/build*/"
         "**/*build/"
         "**/cmake-build-*/"
