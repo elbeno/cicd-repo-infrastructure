@@ -5,7 +5,7 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '^".*'
     Priority: 1
-  - Regex: '^<(container|cib|flow|interrupt|log|lookup|match|msg|safe|sc|seq)/.*'
+  - Regex: '^<(cib|flow|interrupt|log|log_binary|log_fmt|lookup|match|msg|nexus|seq)/.*'
     Priority: 2
   - Regex: '^<groov/.*'
     Priority: 4
