@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 project(test_lib)
 
 include(cmake/get_cpm.cmake)
@@ -29,8 +29,9 @@ target_sources(
               include/test_lib/exclude.hpp
               include/exclude/bad.hpp)
 
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+if(PROJECT_IS_TOP_LEVEL)
     add_docs(docs)
     clang_tidy_interface(TARGET test_lib EXCLUDE_FILESETS exclusions)
+    include(CTest)
     add_subdirectory(test)
 endif()

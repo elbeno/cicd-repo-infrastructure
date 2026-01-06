@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 project(test_app)
 
 include(cmake/get_cpm.cmake)
@@ -11,7 +11,8 @@ add_versioned_package(NAME test_lib SOURCE_DIR
 add_executable(test_app src/test.cpp)
 target_link_libraries(test_app PRIVATE test_lib)
 
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+if(PROJECT_IS_TOP_LEVEL)
+    include(CTest)
     add_subdirectory(test)
     add_subdirectory(recipes)
 endif()
