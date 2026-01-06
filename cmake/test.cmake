@@ -1,5 +1,3 @@
-option(BUILD_TESTING "" OFF)
-include(CTest)
 add_custom_target(${INFRA_TARGET_NAMESPACE}unit_tests)
 add_custom_target(${INFRA_TARGET_NAMESPACE}cpp_tests)
 add_custom_target(${INFRA_TARGET_NAMESPACE}python_tests)
@@ -7,10 +5,6 @@ add_custom_target(${INFRA_TARGET_NAMESPACE}build_unit_tests)
 add_dependencies(
     ${INFRA_TARGET_NAMESPACE}unit_tests ${INFRA_TARGET_NAMESPACE}cpp_tests
     ${INFRA_TARGET_NAMESPACE}python_tests)
-
-set(CMAKE_TESTING_ENABLED
-    1
-    CACHE INTERNAL "")
 
 find_program(MEMORYCHECK_COMMAND NAMES valgrind)
 set(MEMORYCHECK_SUPPRESSIONS_FILE
@@ -93,9 +87,12 @@ endmacro()
 
 macro(add_gherkin)
     if(NOT TARGET gherkin-cpp)
+        block(SCOPE_FOR VARIABLES)
+        set(BUILD_TESTING OFF)
         add_subdirectory(
             ${gunit_SOURCE_DIR}/libs/gherkin-cpp
             ${gunit_BINARY_DIR}/libs/gherkin-cpp EXCLUDE_FROM_ALL SYSTEM)
+        endblock()
     endif()
 endmacro()
 
