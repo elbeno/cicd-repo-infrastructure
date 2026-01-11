@@ -11,12 +11,6 @@ else()
     file(WRITE ${PROJECT_BINARY_DIR}/.gitignore "*")
 endif()
 
-if(NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD
-        20
-        CACHE INTERNAL "" FORCE)
-endif()
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS
     ON
     CACHE BOOL "Export compile commands to compile_commands.json." FORCE)

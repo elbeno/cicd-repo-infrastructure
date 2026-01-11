@@ -68,7 +68,8 @@ function(add_test_coverage_target name)
         add_custom_command(
             OUTPUT coverage/${name}.profraw
             COMMAND env "LLVM_PROFILE_FILE=coverage/${name}.profraw"
-                    $<TARGET_FILE:${name}>
+                    $<TARGET_FILE:${name}> ${ARGN}
+            COMMAND_EXPAND_LISTS
             DEPENDS run_${name})
         add_custom_target(${INFRA_TARGET_NAMESPACE}raw_coverage_${name}
                           DEPENDS coverage/${name}.profraw)

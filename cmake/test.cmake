@@ -22,7 +22,7 @@ target_compile_options(${INFRA_TARGET_NAMESPACE}sanitizer-exceptions
 
 macro(get_catch2)
     if(NOT TARGET Catch2::Catch2WithMain)
-        add_versioned_package("gh:catchorg/Catch2@3.8.0")
+        add_versioned_package("gh:catchorg/Catch2@3.12.0")
         list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
         include(Catch)
 
@@ -70,7 +70,7 @@ macro(get_fuzztest)
             NAME
             fuzztest
             GIT_TAG
-            a4f6ad5
+            d7e0165
             GITHUB_REPOSITORY
             google/fuzztest
             OPTIONS
@@ -109,6 +109,15 @@ macro(add_rapidcheck)
         add_subdirectory(
             ${rapidcheck_SOURCE_DIR}/extras/gmock
             ${rapidcheck_BINARY_DIR}/extras/gmock EXCLUDE_FROM_ALL SYSTEM)
+
+        # Workaround for rapidcheck's use of aligned_storage
+        add_library(${INFRA_TARGET_NAMESPACE}clean-rapidcheck-warnings
+                    INTERFACE)
+        target_compile_options(
+            ${INFRA_TARGET_NAMESPACE}clean-rapidcheck-warnings
+            INTERFACE
+                $<$<VERSION_GREATER_EQUAL:${CMAKE_CXX_STANDARD},23>:-Wno-deprecated-declarations>
+        )
     endif()
 endmacro()
 
@@ -119,8 +128,6 @@ function(add_unit_test_target name)
 
     add_executable(${name} ${UNIT_FILES})
     target_include_directories(${name} PRIVATE ${UNIT_INCLUDE_DIRECTORIES})
-    target_link_libraries(${name} PRIVATE ${UNIT_LIBRARIES})
-    target_link_libraries_system(${name} PRIVATE ${UNIT_SYSTEM_LIBRARIES})
     target_link_libraries(${name} PRIVATE ${INFRA_TARGET_NAMESPACE}sanitizers)
     add_dependencies(${INFRA_TARGET_NAMESPACE}build_unit_tests ${name})
 
@@ -132,18 +139,21 @@ function(add_unit_test_target name)
                 WARNING
                     "${name} is set to NORANDOM: unrandomized tests are not best practice"
             )
-            set(target_test_command $<TARGET_FILE:${name}>)
-            add_test(NAME ${name} COMMAND ${target_test_command})
+            set(test_args "--order" "decl")
+            add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}> ${test_args}
+                                          COMMAND_EXPAND_LISTS)
         else()
-            set(target_test_command $<TARGET_FILE:${name}> "--order" "rand")
             if(DEFINED ENV{CI})
-                add_test(NAME ${name} COMMAND ${target_test_command})
+                add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}>
+                                              ${test_args} COMMAND_EXPAND_LISTS)
             else()
                 catch_discover_tests(${name})
             endif()
         endif()
         target_link_libraries(
             ${name} PRIVATE ${INFRA_TARGET_NAMESPACE}clean-catch2-warnings)
+        target_link_libraries(
+            ${name} PRIVATE ${INFRA_TARGET_NAMESPACE}clean-rapidcheck-warnings)
     elseif(UNIT_GTEST)
         target_link_libraries_system(
             ${name}
@@ -159,16 +169,19 @@ function(add_unit_test_target name)
                 WARNING
                     "${name} is set to NORANDOM: unrandomized tests are not best practice"
             )
-            set(target_test_command $<TARGET_FILE:${name}>)
-            add_test(NAME ${name} COMMAND ${target_test_command})
+            add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}> ${test_args}
+                                          COMMAND_EXPAND_LISTS)
         else()
-            set(target_test_command $<TARGET_FILE:${name}> "--gtest_shuffle")
+            set(test_args "--gtest_shuffle")
             if(DEFINED ENV{CI})
-                add_test(NAME ${name} COMMAND ${target_test_command})
+                add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}>
+                                              ${test_args} COMMAND_EXPAND_LISTS)
             else()
                 gtest_discover_tests(${name})
             endif()
         endif()
+        target_link_libraries(
+            ${name} PRIVATE ${INFRA_TARGET_NAMESPACE}clean-rapidcheck-warnings)
     elseif(UNIT_GUNIT)
         target_include_directories(
             ${name} SYSTEM
@@ -190,32 +203,37 @@ function(add_unit_test_target name)
                 WARNING
                     "${name} is set to NORANDOM: unrandomized tests are not best practice"
             )
-            set(target_test_command $<TARGET_FILE:${name}>)
         else()
-            set(target_test_command $<TARGET_FILE:${name}> "--gtest_shuffle")
+            set(test_args "--gtest_shuffle")
         endif()
-        add_test(NAME ${name} COMMAND ${target_test_command})
+        add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}> ${test_args}
+                                      COMMAND_EXPAND_LISTS)
+        target_link_libraries(
+            ${name} PRIVATE ${INFRA_TARGET_NAMESPACE}clean-rapidcheck-warnings)
     elseif(UNIT_SNITCH)
         target_link_libraries_system(${name} PRIVATE snitch::snitch)
-        set(target_test_command $<TARGET_FILE:${name}>)
-        add_test(NAME ${name} COMMAND ${target_test_command})
+        add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}> ${test_args}
+                                      COMMAND_EXPAND_LISTS)
     else()
-        set(target_test_command $<TARGET_FILE:${name}>)
-        add_test(NAME ${name} COMMAND ${target_test_command})
+        add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}> ${test_args}
+                                      COMMAND_EXPAND_LISTS)
     endif()
+
+    target_link_libraries(${name} PRIVATE ${UNIT_LIBRARIES})
+    target_link_libraries_system(${name} PRIVATE ${UNIT_SYSTEM_LIBRARIES})
 
     add_custom_target(all_${name} ALL DEPENDS run_${name})
     add_custom_target(run_${name} DEPENDS ${name}.passed)
     add_custom_command(
         OUTPUT ${name}.passed
-        COMMAND ${target_test_command}
+        COMMAND $<TARGET_FILE:${name}> ${test_args}
         COMMAND ${CMAKE_COMMAND} "-E" "touch" "${name}.passed"
         DEPENDS ${name})
     add_dependencies(${INFRA_TARGET_NAMESPACE}cpp_tests "run_${name}")
 
     if(UNIT_COVERAGE)
         target_link_libraries(${name} PRIVATE ${INFRA_TARGET_NAMESPACE}coverage)
-        add_test_coverage_target(${name})
+        add_test_coverage_target(${name} ${test_args})
     endif()
 endfunction()
 
