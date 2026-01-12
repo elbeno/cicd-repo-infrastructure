@@ -31,9 +31,9 @@ Where `abc123` is the version of this repository you want to depend on.
 This repository depends on:
 
 - [Boost-ext.DI](https://github.com/boost-ext/di) at version 1.3.2
-- [Catch2](https://github.com/catchorg/Catch2) at version 3.8.0
+- [Catch2](https://github.com/catchorg/Catch2) at version 3.12.0
 - [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) at version 0.40.2
-- [fuzztest](https://github.com/google/fuzztest) at git hash a4f6ad5
+- [fuzztest](https://github.com/google/fuzztest) at git hash d7e0165 (2025-08-05)
 - [GoogleTest](https://github.com/google/googletest) at version 1.16.0
 - [GUnit](https://github.com/cpp-testing/GUnit) at version 1.16.0
 - [metabench](https://github.com/ldionne/metabench) at git hash 3322ce7

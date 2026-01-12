@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
 project(test_lib)
 
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 23)
+endif()
+
 include(cmake/get_cpm.cmake)
 cpmaddpackage(NAME infra SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." GIT_TAG
               HEAD)
