@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Install build tools
         run: |
-          wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh ${{env.TARGET_LLVM_VERSION}}
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm.sh ${{env.TARGET_LLVM_VERSION}}
           sudo apt update && sudo apt install -y pip ninja-build clang-tidy-${{env.TARGET_LLVM_VERSION}} clang-format-${{env.TARGET_LLVM_VERSION}}
 
       - name: Setup Node.js
