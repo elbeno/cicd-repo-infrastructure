@@ -52,7 +52,7 @@ jobs:
           sudo gem install asciidoctor asciidoctor-diagram rouge
 
       - name: Checkout target branch
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{github.base_ref}}
 
@@ -61,7 +61,7 @@ jobs:
         id: target_branch
 
       - name: Checkout PR branch
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install python test requirements
         run: |
@@ -167,7 +167,7 @@ jobs:
         sanitizer: [undefined, address]
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install build tools
         run: |
@@ -229,7 +229,7 @@ jobs:
           sudo dpkg -i ${{env.mull-pkg}}
 
       - name: Checkout PR branch
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Restore CPM cache
         env:
