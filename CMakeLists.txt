@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.27)
 
+# this change is inconsequential just to get a new commit to test self-update
+
 if(NOT PROJECT_NAME)
     project(cicd)
 endif()
