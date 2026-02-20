@@ -36,8 +36,17 @@ function(cicd_check_self_update)
         COMMAND ${GIT_PROGRAM} rev-parse HEAD
         WORKING_DIRECTORY ${my_path}
         OUTPUT_VARIABLE head_hash
+        RESULT_VARIABLE hash_ok
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(head_hash STREQUAL ${CPM_ARGS_GIT_TAG})
+    if(NOT hash_ok EQUAL 0)
+        message(
+            FATAL_ERROR
+                "CICD: error discovering the current hash (`${GIT_PROGRAM} rev-parse HEAD`) in ${my_path}"
+        )
+        return()
+    endif()
+    string(FIND ${head_hash} ${CPM_ARGS_GIT_TAG} hash_pos)
+    if(hash_pos EQUAL 0)
         return()
     endif()
 
@@ -48,12 +57,26 @@ function(cicd_check_self_update)
 
     # what's the hash for what you asked for?
     execute_process(
-        COMMAND ${GIT_PROGRAM} ls-remote -h ${CPM_ARGS_GIT_REPOSITORY}
+        COMMAND ${GIT_PROGRAM} ls-remote ${CPM_ARGS_GIT_REPOSITORY}
                 ${CPM_ARGS_GIT_TAG}
+        COMMAND cut -f1
         WORKING_DIRECTORY ${my_path}
         OUTPUT_VARIABLE remote_hash
+        RESULT_VARIABLE hash_ok
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(REGEX REPLACE "\t.*" "" remote_hash ${remote_hash})
+    if(NOT hash_ok EQUAL 0)
+        message(
+            FATAL_ERROR
+                "CICD: error discovering the remote hash (`${GIT_PROGRAM} ls-remote ${CPM_ARGS_GIT_REPOSITORY} ${CPM_ARGS_GIT_TAG}`) in ${my_path}"
+        )
+        return()
+    else()
+        # success and empty output from git ls-remote probably means we asked
+        # for a hash, not a branch/tag
+        if(remote_hash STREQUAL "")
+            set(remote_hash ${CPM_ARGS_GIT_TAG})
+        endif()
+    endif()
     message(STATUS "CICD: requested version hash is ${remote_hash}")
 
     # do we already fulfil that hash?
@@ -81,8 +104,8 @@ function(cicd_check_self_update)
             RESULT_VARIABLE reset_ok)
         if(NOT reset_ok EQUAL 0)
             message(
-                FATAL
-                "CICD: Couldn't update to ${remote_hash} - check the repository at ${my_path}."
+                FATAL_ERROR
+                    "CICD: Couldn't update to ${remote_hash} - check the repository at ${my_path}."
             )
         endif()
         message(STATUS "CICD: cached version is now at ${remote_hash}")

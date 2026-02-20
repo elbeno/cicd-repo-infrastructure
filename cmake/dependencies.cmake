@@ -229,8 +229,8 @@ function(update_versioned_package)
             RESULT_VARIABLE reset_ok)
         if(NOT reset_ok EQUAL 0)
             message(
-                FATAL
-                "Couldn't update ${ARGS_NAME} to ${ARGS_GIT_TAG} - check the repository at ${pkg_dir}."
+                FATAL_ERROR
+                    "Couldn't update ${ARGS_NAME} to ${ARGS_GIT_TAG} - check the repository at ${pkg_dir}."
             )
         endif()
     else()
