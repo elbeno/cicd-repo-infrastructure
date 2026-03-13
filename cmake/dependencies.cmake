@@ -143,6 +143,9 @@ function(log_dependency_trail parent child depth)
 endfunction()
 
 function(add_versioned_package)
+    set(WARNINGS_AS_ERRORS ${CMAKE_COMPILE_WARNING_AS_ERROR})
+    set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
+
     list(LENGTH ARGN argnLength)
     if(argnLength EQUAL 1)
         cpm_parse_add_package_single_arg("${ARGN}" ARGN)
@@ -183,6 +186,8 @@ function(add_versioned_package)
     set(${CPM_LAST_PACKAGE_NAME}_ADDED
         ${${CPM_LAST_PACKAGE_NAME}_ADDED}
         PARENT_SCOPE)
+
+    set(CMAKE_COMPILE_WARNING_AS_ERROR ${WARNINGS_AS_ERRORS})
 endfunction()
 
 function(update_versioned_package)

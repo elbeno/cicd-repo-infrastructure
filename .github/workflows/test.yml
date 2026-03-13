@@ -18,10 +18,10 @@ on:
 env:
   DEBIAN_FRONTEND: noninteractive
   CMAKE_GENERATOR: Ninja
-  TARGET_LLVM_VERSION: 21
-  MULL_LLVM_MAJOR_VERSION: 19
-  MULL_LLVM_VERSION: 19.1.1
-  MULL_VERSION: 0.27.1
+  TARGET_LLVM_VERSION: 22
+  MULL_LLVM_MAJOR_VERSION: 20
+  MULL_LLVM_VERSION: 20.1.2
+  MULL_VERSION: 0.29.0
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -33,8 +33,10 @@ jobs:
     steps:
       - name: Install build tools
         run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm.sh ${{env.TARGET_LLVM_VERSION}}
-          sudo apt update && sudo apt install -y pip ninja-build clang-tidy-${{env.TARGET_LLVM_VERSION}} clang-format-${{env.TARGET_LLVM_VERSION}}
+          export DISTRO=$(lsb_release -cs)
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          sudo add-apt-repository -y deb https://apt.llvm.org/$DISTRO/ llvm-toolchain-$DISTRO-${{env.TARGET_LLVM_VERSION}} main
+          sudo apt update && sudo apt install -y pip ninja-build clang-${{env.TARGET_LLVM_VERSION}} clang-tidy-${{env.TARGET_LLVM_VERSION}} clang-format-${{env.TARGET_LLVM_VERSION}}
 
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
@@ -171,8 +173,10 @@ jobs:
 
       - name: Install build tools
         run: |
-          wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh ${{env.TARGET_LLVM_VERSION}}
-          sudo apt install -y ninja-build clang-tidy-${{env.TARGET_LLVM_VERSION}} clang-format-${{env.TARGET_LLVM_VERSION}}
+          export DISTRO=$(lsb_release -cs)
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          sudo add-apt-repository -y deb https://apt.llvm.org/$DISTRO/ llvm-toolchain-$DISTRO-${{env.TARGET_LLVM_VERSION}} main
+          sudo apt install -y ninja-build clang-${{env.TARGET_LLVM_VERSION}} clang-tidy-${{env.TARGET_LLVM_VERSION}} clang-format-${{env.TARGET_LLVM_VERSION}}
 
       - name: Restore CPM cache
         env:
@@ -218,15 +222,18 @@ jobs:
     steps:
       - name: Install build tools
         run: |
-          wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh ${{env.MULL_LLVM_MAJOR_VERSION}}
-          sudo apt install -y ninja-build
+          export DISTRO=$(lsb_release -cs)
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          sudo add-apt-repository -y deb https://apt.llvm.org/$DISTRO/ llvm-toolchain-$DISTRO-${{env.TARGET_LLVM_VERSION}} main
+          sudo apt install -y ninja-build clang-${{env.MULL_LLVM_MAJOR_VERSION}}
 
       - name: Install mull
         env:
           mull-pkg: Mull-${{env.MULL_LLVM_MAJOR_VERSION}}-${{env.MULL_VERSION}}-LLVM-${{env.MULL_LLVM_VERSION}}-ubuntu-amd64-24.04.deb
         run: |
-          wget https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/${{env.mull-pkg}}
-          sudo dpkg -i ${{env.mull-pkg}}
+          MULL_DEB="$(mktemp)"
+          wget -O "$MULL_DEB" https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/${{env.mull-pkg}}
+          sudo dpkg -i "$MULL_DEB"
 
       - name: Checkout PR branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

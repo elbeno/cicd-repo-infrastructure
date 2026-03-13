@@ -88,6 +88,7 @@ endmacro()
 macro(add_gherkin)
     if(NOT TARGET gherkin-cpp)
         block(SCOPE_FOR VARIABLES)
+        set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
         set(BUILD_TESTING OFF)
         add_subdirectory(
             ${gunit_SOURCE_DIR}/libs/gherkin-cpp
@@ -98,6 +99,8 @@ endmacro()
 
 macro(add_rapidcheck)
     if(NOT TARGET rapidcheck)
+        block(SCOPE_FOR VARIABLES)
+        set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
         add_versioned_package(NAME rapidcheck GIT_TAG ff6af6f GITHUB_REPOSITORY
                               emil-e/rapidcheck)
         add_subdirectory(
@@ -118,6 +121,7 @@ macro(add_rapidcheck)
             INTERFACE
                 $<$<VERSION_GREATER_EQUAL:${CMAKE_CXX_STANDARD},23>:-Wno-deprecated-declarations>
         )
+        endblock()
     endif()
 endmacro()
 
