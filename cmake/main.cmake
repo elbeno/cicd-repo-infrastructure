@@ -13,7 +13,10 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS
     ON
-    CACHE BOOL "Export compile commands to compile_commands.json." FORCE)
+    CACHE BOOL "Export compile commands to compile_commands.json.")
+set(CMAKE_COMPILE_WARNING_AS_ERROR
+    ON
+    CACHE BOOL "Treat warnings as errors.")
 
 option(INFRA_PROVIDE_GITHUB_WORKFLOWS
        "Provide unit_test and documentation workflows" ON)

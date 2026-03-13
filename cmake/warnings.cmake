@@ -28,7 +28,6 @@ target_compile_options(
         -Wdouble-promotion
         $<$<CXX_COMPILER_ID:GNU>:-Wduplicated-branches>
         $<$<CXX_COMPILER_ID:GNU>:-Wduplicated-cond>
-        -Werror
         -Wextra
         -Wextra-semi
         $<$<AND:$<CXX_COMPILER_ID:Clang>,$<VERSION_GREATER_EQUAL:${CMAKE_CXX_COMPILER_VERSION},8>>:-Wextra-semi-stmt>
