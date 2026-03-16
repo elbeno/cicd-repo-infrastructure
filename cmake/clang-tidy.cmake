@@ -133,17 +133,20 @@ function(clang_tidy_interface)
 endfunction()
 
 if(NOT TARGET ${INFRA_TARGET_NAMESPACE}clang-tidy-canary)
-    message(STATUS "Adding clang-tidy-canary target for ${CMAKE_SOURCE_DIR}")
-    add_custom_command(
-        OUTPUT clang_tidy_canary.alive
-        COMMAND ${CLANG_TIDY_PROGRAM} "--verify-config" 2>clang_tidy.log
-        COMMAND "!" "[" "-s" "clang_tidy.log" "]"
-        COMMAND ${CMAKE_COMMAND} "-E" "touch" "clang_tidy_canary.alive"
-        DEPENDS ${CMAKE_SOURCE_DIR}/.clang-tidy)
-    add_custom_target(${INFRA_TARGET_NAMESPACE}clang-tidy-canary
-                      DEPENDS clang_tidy_canary.alive)
-    add_dependencies(${INFRA_TARGET_NAMESPACE}clang-tidy
-                     ${INFRA_TARGET_NAMESPACE}clang-tidy-canary)
-    add_dependencies(${INFRA_TARGET_NAMESPACE}clang-tidy-branch-diff
-                     ${INFRA_TARGET_NAMESPACE}clang-tidy-canary)
+    if(${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 22)
+        message(
+            STATUS "Adding clang-tidy-canary target for ${CMAKE_SOURCE_DIR}")
+        add_custom_command(
+            OUTPUT clang_tidy_canary.alive
+            COMMAND ${CLANG_TIDY_PROGRAM} "--verify-config" 2>clang_tidy.log
+            COMMAND "!" "[" "-s" "clang_tidy.log" "]"
+            COMMAND ${CMAKE_COMMAND} "-E" "touch" "clang_tidy_canary.alive"
+            DEPENDS ${CMAKE_SOURCE_DIR}/.clang-tidy)
+        add_custom_target(${INFRA_TARGET_NAMESPACE}clang-tidy-canary
+                          DEPENDS clang_tidy_canary.alive)
+        add_dependencies(${INFRA_TARGET_NAMESPACE}clang-tidy
+                         ${INFRA_TARGET_NAMESPACE}clang-tidy-canary)
+        add_dependencies(${INFRA_TARGET_NAMESPACE}clang-tidy-branch-diff
+                         ${INFRA_TARGET_NAMESPACE}clang-tidy-canary)
+    endif()
 endif()
