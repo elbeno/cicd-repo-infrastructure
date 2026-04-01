@@ -16,13 +16,6 @@ if(SANITIZERS)
                                INTERFACE -fsanitize-memory-track-origins)
     endif()
 
-    string(REGEX MATCH "address|memory|thread" SANITIZER_NEW_DEL
-                 "${SANITIZERS}")
-    if(SANITIZER_NEW_DEL)
-        target_compile_definitions(${INFRA_TARGET_NAMESPACE}sanitizers
-                                   INTERFACE SANITIZER_NEW_DEL)
-    endif()
-
     target_link_options(${INFRA_TARGET_NAMESPACE}sanitizers INTERFACE
                         -fsanitize=${SANITIZERS})
 endif()
