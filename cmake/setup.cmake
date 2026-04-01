@@ -172,6 +172,6 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
             "${CMAKE_SOURCE_DIR}/.github/workflows" FORCE)
         compare_and_update_file(
             dependabot.yml "${CMAKE_CURRENT_SOURCE_DIR}/ci/.github"
-            "${CMAKE_SOURCE_DIR}/.github" FORCE)
+            "${CMAKE_SOURCE_DIR}/.github")
     endif()
 endif()
