@@ -23,7 +23,9 @@ if(NOT COMMAND boost_hana_recipe)
             GIT_TAG
             ${VERSION}
             DOWNLOAD_ONLY
-            YES)
+            YES
+            TARGET
+            boost_hana)
         if(NOT TARGET boost_hana)
             add_library(boost_hana INTERFACE)
             target_include_directories(boost_hana
