@@ -17,6 +17,7 @@ target_link_libraries(test_app PRIVATE test_lib)
 
 if(PROJECT_IS_TOP_LEVEL)
     include(CTest)
+    add_subdirectory(idempotence)
     add_subdirectory(test)
     add_subdirectory(recipes)
 endif()

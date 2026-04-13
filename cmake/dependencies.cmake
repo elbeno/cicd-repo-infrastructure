@@ -143,15 +143,17 @@ function(log_dependency_trail parent child depth)
 endfunction()
 
 function(add_versioned_package)
-    set(WARNINGS_AS_ERRORS ${CMAKE_COMPILE_WARNING_AS_ERROR})
-    set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
-
-    list(LENGTH ARGN argnLength)
-    if(argnLength EQUAL 1)
+    if(ARGC EQUAL 1)
         cpm_parse_add_package_single_arg("${ARGN}" ARGN)
+    elseif(ARGC GREATER 1)
+        if(ARGV0 STREQUAL "URI")
+            cpm_parse_add_package_single_arg("${ARGV1}" TMP)
+            list(REMOVE_AT ARGN 0 1)
+            list(PREPEND ARGN ${TMP})
+        endif()
     endif()
 
-    set(oneValueArgs NAME VERSION GITHUB_REPOSITORY GIT_TAG COMPARE)
+    set(oneValueArgs NAME VERSION GITHUB_REPOSITORY GIT_TAG COMPARE TARGET)
     cmake_parse_arguments(ARGS "" "${oneValueArgs}" "" "${ARGN}")
     if(NOT DEFINED ARGS_GIT_TAG)
         set(ARGS_GIT_TAG v${ARGS_VERSION})
@@ -160,8 +162,24 @@ function(add_versioned_package)
         set(ARGS_COMPARE GREATER_EQUAL)
     endif()
     if(NOT DEFINED ARGS_NAME)
-        set(ARGS_NAME ${ARGS_GITHUB_REPOSITORY})
+        cpm_package_name_from_git_uri(
+            "https://github.com/${ARGS_GITHUB_REPOSITORY}.git" ARGS_NAME)
     endif()
+
+    if(DEFINED ARGS_TARGET AND TARGET ${ARGS_TARGET})
+        message(
+            WARNING
+                "add_versioned_package: skipping ${ARGS_NAME} because the expected target ${ARGS_TARGET} already exists."
+        )
+        if(DEFINED ${ARGS_NAME}_SOURCE_DIR)
+            check_dependency_version(${ARGS_NAME} ${ARGS_GIT_TAG}
+                                     ${ARGS_COMPARE})
+        endif()
+        return()
+    endif()
+
+    set(WARNINGS_AS_ERRORS ${CMAKE_COMPILE_WARNING_AS_ERROR})
+    set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 
     set(DEPS_PARENT_INDENT "${DEPS_INDENT}")
     set(DEPS_INDENT "${ARGS_NAME}@${ARGS_GIT_TAG}")

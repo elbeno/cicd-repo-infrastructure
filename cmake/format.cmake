@@ -3,15 +3,8 @@ if(CLANG_FORMAT_PROGRAM)
     message(STATUS "clang-format found: ${CLANG_FORMAT_PROGRAM}")
 endif()
 
-add_versioned_package(
-    NAME
-    Format.cmake
-    VERSION
-    1.7.3
-    GITHUB_REPOSITORY
-    TheLartians/Format.cmake
-    OPTIONS
-    "CMAKE_FORMAT_EXCLUDE cmake/get_cpm.cmake")
+add_versioned_package(URI "gh:TheLartians/Format.cmake@1.7.3" OPTIONS
+                      "CMAKE_FORMAT_EXCLUDE cmake/get_cpm.cmake")
 
 if(NOT "${INFRA_TARGET_NAMESPACE}" STREQUAL "")
     add_custom_target(${INFRA_TARGET_NAMESPACE}clang-format
