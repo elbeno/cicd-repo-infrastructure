@@ -33,6 +33,7 @@ macro(get_catch2)
             INTERFACE
                 $<$<AND:$<CXX_COMPILER_ID:Clang>,$<VERSION_GREATER_EQUAL:${CMAKE_CXX_COMPILER_VERSION},19>>:-Wno-c++20-extensions>
         )
+        target_compile_definitions(Catch2 PRIVATE CATCH_CONFIG_NO_POSIX_SIGNALS)
     endif()
 endmacro()
 
