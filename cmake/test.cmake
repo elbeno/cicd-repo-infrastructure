@@ -22,7 +22,7 @@ target_compile_options(${INFRA_TARGET_NAMESPACE}sanitizer-exceptions
 
 macro(get_catch2)
     if(NOT TARGET Catch2::Catch2WithMain)
-        add_versioned_package("gh:catchorg/Catch2@3.12.0")
+        add_versioned_package("gh:catchorg/Catch2@3.15.0")
         list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
         include(Catch)
 
@@ -70,7 +70,7 @@ macro(get_fuzztest)
             NAME
             fuzztest
             GIT_TAG
-            d7e0165
+            "2026-02-19"
             GITHUB_REPOSITORY
             google/fuzztest
             OPTIONS
