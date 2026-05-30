@@ -71,7 +71,7 @@ jobs:
 
       - name: Build documentation
         run: |
-          test $(cmake --build build -v -t docs | grep -c ERROR) == 0
+          test "$(cmake --build build -v -t docs | grep -c ERROR)" == 0
           touch ./build/docs/.nojekyll
           ls -la ./build/docs
 
