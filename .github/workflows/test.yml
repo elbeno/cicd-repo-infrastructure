@@ -104,7 +104,7 @@ jobs:
         working-directory: ${{github.workspace}}/test/library
         run: cmake --build build -t infra.ci-quality
 
-      - &restore-cpm-cache
+      - &restore_cpm_cache
         name: Restore CPM cache
         env:
           cache-name: cpm-cache-0
@@ -124,7 +124,7 @@ jobs:
         working-directory: ${{github.workspace}}/test/application
         run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache -DINFRA_TARGET_NAMESPACE=infra
 
-      - &save-cpm-cache
+      - &save_cpm_cache
         name: Save CPM cache
         env:
           cache-name: cpm-cache-0
@@ -183,7 +183,7 @@ jobs:
       - name: Install build tools
         run: sudo apt install -y ninja-build clang-${{env.TARGET_LLVM_VERSION}} clang-tidy-${{env.TARGET_LLVM_VERSION}} clang-format-${{env.TARGET_LLVM_VERSION}}
 
-      - *restore-cpm-cache
+      - *restore_cpm_cache
 
       - name: Configure cmake for app
         env:
@@ -193,7 +193,7 @@ jobs:
         working-directory: ${{github.workspace}}/test/application
         run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache -DINFRA_TARGET_NAMESPACE=infra
 
-      - *save-cpm-cache
+      - *save_cpm_cache
 
       # https://github.com/actions/runner-images/issues/9524
       - name: Fix kernel mmap rnd bits
@@ -225,7 +225,7 @@ jobs:
           wget -O "$MULL_DEB" https://github.com/mull-project/mull/releases/download/${{env.MULL_VERSION}}/${{env.mull-pkg}}
           sudo dpkg -i "$MULL_DEB"
 
-      - *restore-cpm-cache
+      - *restore_cpm_cache
 
       - name: Configure cmake for app
         env:
@@ -234,7 +234,7 @@ jobs:
         working-directory: ${{github.workspace}}/test/application
         run: cmake -Bbuild -DCPM_SOURCE_CACHE=~/cpm-cache -DINFRA_TARGET_NAMESPACE=infra
 
-      - *save-cpm-cache
+      - *save_cpm_cache
 
       - name: Build app and run mull tests
         working-directory: ${{github.workspace}}/test/application
