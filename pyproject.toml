@@ -12,3 +12,11 @@ dependencies = [
   "pyyaml",
   "clang-format"
 ]
+license = "BSL-1.0"
+
+[project.urls]
+Repository = "https://github.com/intel/cicd-repo-infrastructure/"
+Documentation = "https://intel.github.io/cicd-repo-infrastructure/"
+
+[tool.setuptools]
+packages = []
