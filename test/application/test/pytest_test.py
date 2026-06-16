@@ -1,4 +1,5 @@
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 small_ints = st.integers(min_value=0, max_value=1000)
 

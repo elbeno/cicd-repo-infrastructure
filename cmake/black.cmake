@@ -41,7 +41,3 @@ endfunction()
 
 add_black_format_target("check")
 add_black_format_target("fix")
-add_dependencies(${INFRA_TARGET_NAMESPACE}quality
-                 ${INFRA_TARGET_NAMESPACE}check-black-format)
-add_dependencies(${INFRA_TARGET_NAMESPACE}ci-quality
-                 ${INFRA_TARGET_NAMESPACE}check-black-format)
