@@ -10,7 +10,8 @@ dependencies = [
   "mypy",
   "cmakelang",
   "pyyaml",
-  "clang-format"
+  "clang-format",
+  "ruff"
 ]
 license = "BSL-1.0"
 
