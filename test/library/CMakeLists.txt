@@ -5,8 +5,6 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 23)
 endif()
 
-set(INFRA_PYTHON_FORMATTER ruff)
-
 include(cmake/get_cpm.cmake)
 cpmaddpackage(NAME infra SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." GIT_TAG
               HEAD)

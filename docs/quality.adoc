@@ -51,7 +51,7 @@ provides three targets for cmake-format:
 
 === `black`
 
-Python code is formatted using https://github.com/psf/black[black]. There are
+Python code may be formatted using https://github.com/psf/black[black]. There are
 two targets with the appropriate behavior:
 
 - `check-black-format`
@@ -59,6 +59,9 @@ two targets with the appropriate behavior:
 
 NOTE: Like `fix-clang-format`, `fix-black-format` won't change files that are
 already changed in git's working tree.
+
+NOTE: `black` is used for Python formatting if `INFRA_PYTHON_FORMATTER` is set
+to `black`. By default, it is set to xref:quality.adoc#_ruff[`ruff`].
 
 === `clang-tidy`
 
@@ -226,6 +229,17 @@ mypy_lint(FILES file1.py file2.py)
 
 And then building the `mypy-lint` target runs `mypy` against these files.
 
+=== `ruff`
+
+By default, Python code is formatted using https://docs.astral.sh/ruff/[ruff]. There are
+two targets with the appropriate behavior:
+
+- `check-ruff-format`
+- `fix-ruff-format`
+
+NOTE: Like `fix-clang-format`, `fix-ruff-format` won't change files that are
+already changed in git's working tree.
+
 === The `quality` target
 
 The `quality` target encompasses other targets:
@@ -233,12 +247,12 @@ The `quality` target encompasses other targets:
 - `check-clang-format`
 - `check-cmake-format`
 - `clang-tidy`
-- `check-black-format`
+- `check-ruff-format`
 - `mypy-lint`
 
 This is a convenient target to build on the command-line to check that
 CI will pass. And any formatting failures can be fixed up by building the
-`fix-clang-format`, `fix-cmake-format`, and `fix-black-format` targets.
+`fix-clang-format`, `fix-cmake-format`, and `fix-ruff-format` targets.
 
 NOTE: The `quality` job that is run by CI always uses the latest clang version
 enabled in CI. Sometimes this can disagree with what is run locally, if you have
