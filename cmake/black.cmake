@@ -1,8 +1,5 @@
-function(black_format)
-    message(STATUS "black_format(...) is disabled because black was not found.")
-endfunction()
-
 find_program(BLACK_PROGRAM "black")
+
 if(BLACK_PROGRAM)
     message(STATUS "black found at ${BLACK_PROGRAM}")
 else()
@@ -41,3 +38,8 @@ endfunction()
 
 add_black_format_target("check")
 add_black_format_target("fix")
+
+add_dependencies(${INFRA_TARGET_NAMESPACE}quality
+                 ${INFRA_TARGET_NAMESPACE}check-black-format)
+add_dependencies(${INFRA_TARGET_NAMESPACE}ci-quality
+                 ${INFRA_TARGET_NAMESPACE}check-black-format)

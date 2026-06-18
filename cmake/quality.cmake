@@ -29,13 +29,5 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     include(${CMAKE_CURRENT_LIST_DIR}/clang-tidy.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/mypy.cmake)
 
-    include(${CMAKE_CURRENT_LIST_DIR}/black.cmake)
-    include(${CMAKE_CURRENT_LIST_DIR}/ruff.cmake)
-
-    add_dependencies(
-        ${INFRA_TARGET_NAMESPACE}quality
-        ${INFRA_TARGET_NAMESPACE}check-${INFRA_PYTHON_FORMATTER}-format)
-    add_dependencies(
-        ${INFRA_TARGET_NAMESPACE}ci-quality
-        ${INFRA_TARGET_NAMESPACE}check-${INFRA_PYTHON_FORMATTER}-format)
+    include(${CMAKE_CURRENT_LIST_DIR}/${INFRA_PYTHON_FORMATTER}.cmake)
 endif()
