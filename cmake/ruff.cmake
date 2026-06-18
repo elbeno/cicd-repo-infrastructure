@@ -1,8 +1,5 @@
-function(ruff_format)
-    message(STATUS "ruff_format(...) is disabled because ruff was not found.")
-endfunction()
-
 find_program(RUFF_PROGRAM "ruff")
+
 if(RUFF_PROGRAM)
     message(STATUS "ruff found at ${RUFF_PROGRAM}")
 else()
@@ -41,3 +38,8 @@ endfunction()
 
 add_ruff_format_target("check")
 add_ruff_format_target("fix")
+
+add_dependencies(${INFRA_TARGET_NAMESPACE}quality
+                 ${INFRA_TARGET_NAMESPACE}check-ruff-format)
+add_dependencies(${INFRA_TARGET_NAMESPACE}ci-quality
+                 ${INFRA_TARGET_NAMESPACE}check-ruff-format)
