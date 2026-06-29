@@ -129,11 +129,12 @@ jobs:
         env:
           cache-name: cpm-cache-0
         id: cpm-cache-restore
-        uses: actions/cache/restore@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/cpm-cache
           key: ${{runner.os}}-${{env.cache-name}}-${{ hashFiles('**/CMakeLists.txt', 'cmake/**') }}
           restore-keys: |
+            ${{runner.os}}-${{env.cache-name}}-${{ hashFiles('**/CMakeLists.txt', 'cmake/**') }}
             ${{runner.os}}-${{env.cache-name}}-
 
       - name: Configure CMake
@@ -141,16 +142,6 @@ jobs:
           CC: ${{matrix.toolchain_root}}/bin/${{matrix.cc}}
           CXX: ${{matrix.toolchain_root}}/bin/${{matrix.cxx}}
         run: cmake -B ${{github.workspace}}/build -DCMAKE_CXX_STANDARD=${{matrix.cxx_standard}} -DCMAKE_CXX_FLAGS_INIT=${{matrix.cxx_flags}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCPM_SOURCE_CACHE=~/cpm-cache
-
-      - &save_cpm_cache
-        name: Save CPM cache
-        env:
-          cache-name: cpm-cache-0
-        if: steps.cpm-cache-restore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
-        with:
-          path: ~/cpm-cache
-          key: ${{runner.os}}-${{env.cache-name}}-${{ hashFiles('**/CMakeLists.txt', 'cmake/**') }}
 
       - name: Build Unit Tests
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.build_type}} -v -t build_unit_tests
@@ -200,8 +191,6 @@ jobs:
           PR_TARGET_BRANCH: ${{ steps.target_branch.outputs.branch }}
         run: cmake -B ${{github.workspace}}/build -DCMAKE_CXX_STANDARD=${{env.DEFAULT_CXX_STANDARD}} -DCPM_SOURCE_CACHE=~/cpm-cache
 
-      - *save_cpm_cache
-
       - name: Run quality checks
         run: cmake --build ${{github.workspace}}/build -t ci-quality
 
@@ -245,8 +234,6 @@ jobs:
           SANITIZERS: ${{matrix.sanitizer}}
         run: cmake -B ${{github.workspace}}/build -DCMAKE_CXX_STANDARD=${{env.DEFAULT_CXX_STANDARD}} -DCPM_SOURCE_CACHE=~/cpm-cache
 
-      - *save_cpm_cache
-
       # https://github.com/actions/runner-images/issues/9524
       - name: Fix kernel mmap rnd bits
         # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
@@ -273,8 +260,6 @@ jobs:
           CC: "/usr/bin/gcc-${{env.DEFAULT_GCC_VERSION}}"
           CXX: "/usr/bin/g++-${{env.DEFAULT_GCC_VERSION}}"
         run: cmake -B ${{github.workspace}}/build -DCMAKE_CXX_STANDARD=${{env.DEFAULT_CXX_STANDARD}} -DCPM_SOURCE_CACHE=~/cpm-cache
-
-      - *save_cpm_cache
 
       - name: Build Unit Tests
         run: cmake --build ${{github.workspace}}/build -t build_unit_tests
@@ -339,8 +324,6 @@ jobs:
           CC: "/usr/lib/llvm-${{env.MULL_LLVM_MAJOR_VERSION}}/bin/clang"
           CXX: "/usr/lib/llvm-${{env.MULL_LLVM_MAJOR_VERSION}}/bin/clang++"
         run: cmake -B ${{github.workspace}}/build -DCMAKE_CXX_STANDARD=${{env.DEFAULT_CXX_STANDARD}} -DCPM_SOURCE_CACHE=~/cpm-cache
-
-      - *save_cpm_cache
 
       - name: Build and run mull tests
         run: cmake --build build -t mull_tests
