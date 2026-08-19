@@ -98,3 +98,5 @@ add_benchmark(
     LIBRARIES
     ${INFRA_TARGET_NAMESPACE}diagnostics
     ${INFRA_TARGET_NAMESPACE}warnings)
+
+add_approval_test(apptest_test FILES apptest_test.py EXTRA_ARGS --pass)

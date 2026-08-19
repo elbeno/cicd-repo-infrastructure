@@ -512,3 +512,7 @@ function(add_compile_fail_test test_file)
     set_tests_properties(${CF_NAME} PROPERTIES PASS_REGULAR_EXPRESSION
                                                "${pattern}")
 endfunction()
+
+function(add_approval_test name)
+    add_unit_test(${name} PYTEST ${ARGN})
+endfunction()

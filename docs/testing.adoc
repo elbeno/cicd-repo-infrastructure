@@ -68,9 +68,37 @@ dependencies that are not part of the CMake dependency tree. A `conftest.py`
 file in the same directory as any of the `FILE`​s is automatically discovered as
 such a dependency.
 
-NOTE: Python tests use several testing packages; these can be installed using
-`requirements.txt` which is provided through the `INFRA_PROVIDE_PYTEST_REQS`
+NOTE: Python tests use several testing packages; these can be installed using (the preferred method) `uv`
+or (the older method) `pip` with `requirements.txt` which is provided through the `INFRA_PROVIDE_PYTEST_REQS`
 option.
+
+Example `pyproject.toml` snippet showing dependency on this repo package:
+[source,toml]
+----
+[project]
+dependencies = [
+  "intel-cicd-repo-infrastructure"
+]
+
+[tool.uv.sources]
+intel-cicd-repo-infrastructure = { git = "https://github.com/intel/cicd-repo-infrastructure", branch = "dev" }
+----
+
+=== Approval tests
+
+[source,cmake]
+----
+add_approval_test(
+  my_test
+  FILES my_test.py)
+----
+
+`add_approval_test` adds a Python approval test using https://pytest.org[pytest] and
+https://approvaltests.com[approvaltests].
+
+NOTE: `add_approval_test` is a wrapper for `add_unit_test(${name} PYTEST ...)`;
+all the same arguments are available. Approval tests are executed using
+`pytest`.
 
 === Fuzz tests
 

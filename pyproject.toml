@@ -6,6 +6,8 @@ dependencies = [
   "pytest",
   "pytest-xdist",
   "hypothesis",
+  "approvaltests",
+  "pytest-approvaltests",
   "black",
   "mypy",
   "cmakelang",
