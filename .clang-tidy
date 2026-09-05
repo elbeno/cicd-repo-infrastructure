@@ -26,7 +26,6 @@ Checks: >
   google-explicit-constructor,
   google-readability-casting,
   google-runtime-int,
-  hicpp-signed-bitwise,
   misc-*,
   -misc-include-cleaner,
   -misc-non-private-member-variables-in-classes,

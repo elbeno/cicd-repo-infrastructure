@@ -102,7 +102,7 @@ macro(add_rapidcheck)
     if(NOT TARGET rapidcheck)
         block(SCOPE_FOR VARIABLES)
         set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
-        add_versioned_package(NAME rapidcheck GIT_TAG ff6af6f GITHUB_REPOSITORY
+        add_versioned_package(NAME rapidcheck GIT_TAG 6e8dadf GITHUB_REPOSITORY
                               emil-e/rapidcheck)
         add_subdirectory(
             ${rapidcheck_SOURCE_DIR}/extras/catch
